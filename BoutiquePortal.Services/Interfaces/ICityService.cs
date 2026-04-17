@@ -14,7 +14,7 @@ namespace BoutiquePortal.Services.Interfaces
         Task<int> AddAsync(City city);
         Task<int> UpdateAsync(City city);
         Task<int> DeleteAsync(int id);
-
+        Task<IEnumerable<City>> GetByStateId(int stateId);
     }
 
 }

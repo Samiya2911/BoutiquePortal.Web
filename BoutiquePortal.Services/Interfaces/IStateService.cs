@@ -14,6 +14,6 @@ namespace BoutiquePortal.Services.Interfaces
         Task<int> AddAsync(State state);
         Task<int> UpdateAsync(State state);
         Task<int> DeleteAsync(int id);
-
+        Task<IEnumerable<State>> GetByCountryId(int countryId);
     }
 }

@@ -24,6 +24,10 @@ namespace BoutiquePortal.Services.Services
         public Task<int> AddAsync(State entity) => _repo.AddAsync(entity);
         public Task<int> UpdateAsync(State entity) => _repo.UpdateAsync(entity);
         public Task<int> DeleteAsync(int id) => _repo.DeleteAsync(id);
+        public async Task<IEnumerable<State>> GetByCountryId(int countryId)
+        {
+            return await _repo.GetByCountryId(countryId);
+        }
 
     }
 }

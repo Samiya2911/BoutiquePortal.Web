@@ -95,16 +95,16 @@ namespace BoutiquePortal.Web.Areas.Admin.Controllers
 
         // // ================== AJAX ==================
 
-        //public async Task<JsonResult> GetStatesByCountry(int countryId)
-        //{
-        //    var data = await _stateService.GetByCountryId(countryId);
-        //    return Json(data);
-        //}
+        public async Task<JsonResult> GetStatesByCountry(int countryId)
+        {
+            var data = await _stateService.GetByCountryId(countryId);
+            return Json(data);
+        }
 
-        //public async Task<JsonResult> GetCitiesByState(int stateId)
-        //{
-        //    var data = await _service.GetByStateId(stateId);
-        //    return Json(data);
-        //}
+        public async Task<JsonResult> GetCitiesByState(int stateId)
+        {
+            var data = await _service.GetByStateId(stateId);
+            return Json(data);
+        }
     }
 }

@@ -13,7 +13,8 @@ namespace BoutiquePortal.Model.Models
         public string CityCode { get; set; }
         public int StateId { get; set; }
         public bool IsActive { get; set; }
+        public int CountryId { get; set; }
         public string StateName { get; set; }
         public string CountryName { get; set; }
-    }
+    }   
 }
