@@ -1,0 +1,79 @@
+﻿@model BoutiquePortal.Model.Models.City
+
+@{
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+    bool isEdit = Model.CityId > 0;
+    ViewBag.Title = isEdit ? "Edit City" : "Add City";
+}
+
+<div class="container mt-4">
+    <h2 class="mb-4">@ViewBag.Title</h2>
+
+    <form method="post" id="LocationForm" asp-area="Admin" asp-controller="City" asp-action="AddEdit">
+        @Html.AntiForgeryToken()
+
+        <input type="hidden" name="CityId" value="@Model.CityId" />
+
+        <div class="card shadow p-4">
+
+            <!-- COUNTRY -->
+            <div class="mb-3">
+                <label class="form-label">Country *</label>
+                <select id="CountryId" class="form-control">
+                    <option value="">-- Select Country --</option>
+
+                    @foreach (var c in ViewBag.Countries)
+                    {
+                        <option value="@c.CountryId">@c.CountryName</option>
+                    }
+                </select>
+                <span id="err-CountryId" class="text-danger small"></span>
+            </div>
+
+            <!-- STATE -->
+            <div class="mb-3">
+                <label class="form-label">State *</label>
+                <select id="StateId" name="StateId" class="form-control">
+                    <option value="">-- Select State --</option>
+                </select>
+                <span id="err-StateId" class="text-danger small"></span>
+            </div>
+
+            <!-- CITY NAME -->
+            <div class="mb-3">
+                <label class="form-label">City Name *</label>
+                <input type="text" id="CityName" name="CityName"
+                       value="@Model.CityName"
+                       class="form-control" />
+                <span id="err-CityName" class="text-danger small"></span>
+            </div>
+
+            <!-- CITY CODE -->
+            <div class="mb-3">
+                <label class="form-label">City Code *</label>
+                <input type="text" id="CityCode" name="CityCode"
+                       value="@Model.CityCode"
+                       class="form-control" />
+                <span id="err-CityCode" class="text-danger small"></span>
+            </div>
+
+            <!-- ACTIVE -->
+            <div class="form-check mb-3">
+                <input type="checkbox" name="IsActive" value="true"
+                       class="form-check-input"
+                       @(Model.IsActive ? "checked" : "") />
+                <label class="form-check-label">Active</label>
+            </div>
+
+            <button type="submit" class="btn btn-primary">
+                @(isEdit ? "Update" : "Save")
+            </button>
+
+            <a href="/Admin/City/Index" class="btn btn-secondary ms-2">Cancel</a>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <script src="~/js/location.js"></script>
+}

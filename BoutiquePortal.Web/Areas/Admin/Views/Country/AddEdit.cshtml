@@ -1,0 +1,57 @@
+﻿@model BoutiquePortal.Model.Models.Country
+
+@{
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+    bool isEdit = Model.CountryId > 0;
+    ViewBag.Title = isEdit ? "Edit Country" : "Add Country";
+}
+
+<div class="container mt-4">
+    <h2 class="mb-4">@ViewBag.Title</h2>
+
+    <form method="post" id="CountryForm" asp-area="Admin" asp-controller="Country" asp-action="AddEdit">
+        @Html.AntiForgeryToken()
+
+        <input type="hidden" name="CountryId" value="@Model.CountryId" />
+
+        <div class="card shadow p-4">
+
+            <!-- COUNTRY NAME -->
+            <div class="mb-3">
+                <label class="form-label">Country Name *</label>
+                <input type="text" id="CountryName" name="CountryName"
+                       value="@Model.CountryName"
+                       class="form-control" />
+                <span id="err-CountryName" class="text-danger small"></span>
+            </div>
+
+            <!-- COUNTRY CODE -->
+            <div class="mb-3">
+                <label class="form-label">Country Code *</label>
+                <input type="text" id="CountryCode" name="CountryCode"
+                       value="@Model.CountryCode"
+                       class="form-control" />
+                <span id="err-CountryCode" class="text-danger small"></span>
+            </div>
+
+            <!-- ACTIVE -->
+            <div class="form-check mb-3">
+                <input type="checkbox" name="IsActive" value="true"
+                       class="form-check-input"
+                       @(Model.IsActive ? "checked" : "") />
+                <label class="form-check-label">Active</label>
+            </div>
+
+            <!-- BUTTON -->
+            <button type="submit" class="btn btn-primary">
+                @(isEdit ? "Update" : "Save")
+            </button>
+
+            <a href="/Admin/Country/Index" class="btn btn-secondary ms-2">Cancel</a>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <script src="~/js/location.js"></script>
+}

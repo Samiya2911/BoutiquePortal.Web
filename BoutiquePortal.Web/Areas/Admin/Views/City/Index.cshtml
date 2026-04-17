@@ -1,0 +1,86 @@
+﻿@model IEnumerable<BoutiquePortal.Model.Models.City>
+
+@{
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+    ViewBag.Title = "City";
+}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between mb-3">
+        <h2>City List</h2>
+
+        <a href="/Admin/City/AddEdit" class="btn btn-success">
+            <i class="fa fa-plus"></i> Add City
+        </a>
+    </div>
+
+    <div class="card shadow">
+        <div class="card-body table-responsive">
+
+            <table class="table table-bordered table-hover align-middle">
+                <thead class="table-dark">
+                    <tr>
+                        <th>#</th>
+                        <th>City Name</th>
+                        <th>Code</th>
+                        <th>State</th>
+                        <th>Country</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @if (!Model.Any())
+                    {
+                        <tr>
+                            <td colspan="7" class="text-center">No Data Found</td>
+                        </tr>
+                    }
+                    else
+                    {
+                        int i = 1;
+                        foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>@i</td>
+                                <td>@item.CityName</td>
+                                <td>@item.CityCode</td>
+                                <td>@item.StateName</td>
+                                <td>@item.CountryName</td>
+
+                                <td>
+                                    <span class="badge bg-@(item.IsActive ? "success" : "danger")">
+                                        @(item.IsActive ? "Active" : "Inactive")
+                                    </span>
+                                </td>
+
+                                <td>
+                                    <a href="/Admin/City/AddEdit/@item.CityId"
+                                       class="btn btn-sm btn-primary">Edit</a>
+
+                                    <form action="/Admin/City/Delete"
+                                          method="post"
+                                          class="delete-form d-inline">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="id" value="@item.CityId" />
+
+                                        <button type="submit" class="btn btn-sm btn-danger">
+                                            Delete
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                            i++;
+                        }
+                    }
+                </tbody>
+            </table>
+
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/location.js"></script>
+}

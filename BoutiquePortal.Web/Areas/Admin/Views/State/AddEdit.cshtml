@@ -1,0 +1,73 @@
+﻿@model BoutiquePortal.Model.Models.State
+
+@{
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+    bool isEdit = Model.StateId > 0;
+    ViewBag.Title = isEdit ? "Edit State" : "Add State";
+}
+
+<div class="container mt-4">
+    <h2 class="mb-4">@ViewBag.Title</h2>
+
+    <form method="post" id="StateForm" asp-area="Admin" asp-controller="State" asp-action="AddEdit">
+        @Html.AntiForgeryToken()
+
+        <input type="hidden" name="StateId" value="@Model.StateId" />
+
+        <div class="card shadow p-4">
+
+            <!-- COUNTRY -->
+            <div class="mb-3">
+                <label class="form-label">Country *</label>
+                <select name="CountryId" id="CountryId" class="form-control">
+                    <option value="">-- Select Country --</option>
+
+                    @foreach (var c in ViewBag.Countries)
+                    {
+                        <option value="@c.CountryId"
+                                selected="@(c.CountryId == Model.CountryId)">
+                            @c.CountryName
+                        </option>
+                    }
+                </select>
+                <span id="err-CountryId" class="text-danger small"></span>
+            </div>
+
+            <!-- STATE NAME -->
+            <div class="mb-3">
+                <label class="form-label">State Name *</label>
+                <input type="text" id="StateName" name="StateName"
+                       value="@Model.StateName"
+                       class="form-control" />
+                <span id="err-StateName" class="text-danger small"></span>
+            </div>
+
+            <!-- STATE CODE -->
+            <div class="mb-3">
+                <label class="form-label">State Code *</label>
+                <input type="text" id="StateCode" name="StateCode"
+                       value="@Model.StateCode"
+                       class="form-control" />
+                <span id="err-StateCode" class="text-danger small"></span>
+            </div>
+
+            <!-- ACTIVE -->
+            <div class="form-check mb-3">
+                <input type="checkbox" name="IsActive" value="true"
+                       class="form-check-input"
+                       @(Model.IsActive ? "checked" : "") />
+                <label class="form-check-label">Active</label>
+            </div>
+
+            <button type="submit" class="btn btn-primary">
+                @(isEdit ? "Update" : "Save")
+            </button>
+
+            <a href="/Admin/State/Index" class="btn btn-secondary ms-2">Cancel</a>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <script src="~/js/location.js"></script>
+}

@@ -1,0 +1,148 @@
+﻿@model BoutiquePortal.Model.Models.SubCategory
+
+@{
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+    bool isEdit = Model.SubCategoryId > 0;
+    ViewBag.Title = isEdit ? "Edit SubCategory" : "Add SubCategory";
+}
+
+<div class="container mt-4">
+    <h2 class="mb-4">@ViewBag.Title</h2>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show">
+            @TempData["Success"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+    @if (TempData["DebugErrors"] != null)
+    {
+        <div class="alert alert-danger">
+            <strong>Validation failed:</strong> @TempData["DebugErrors"]
+        </div>
+    }
+
+    <form method="post"
+          id="SubCategoryForm"
+          enctype="multipart/form-data"
+          asp-area="Admin"
+          asp-controller="SubCategory"
+          asp-action="AddEdit">
+
+        @Html.AntiForgeryToken()
+
+        <input type="hidden" name="SubCategoryId" value="@Model.SubCategoryId" />
+        <input type="hidden" name="SubCategoryImage" value="@Model.SubCategoryImage" />
+
+        <div class="card shadow p-4">
+
+            <!-- ✅ CATEGORY DROPDOWN -->
+            <div class="mb-3">
+                <label class="form-label">Category *</label>
+
+                <select name="CategoryId" class="form-control">
+                    <option value="">-- Select Category --</option>
+
+                    @if (ViewBag.Categories != null)
+                    {
+                        foreach (var item in ViewBag.Categories)
+                        {
+                            <option value="@item.CategoryId"
+                                    selected="@(item.CategoryId == Model.CategoryId)">
+                                @item.CategoryName
+                            </option>
+                        }
+                    }
+                </select>
+
+                <span id="err-Category" class="text-danger small"></span>
+            </div>
+
+            <!-- ✅ SUBCATEGORY NAME -->
+            <div class="mb-3">
+                <label class="form-label">
+                    SubCategory Name <span class="text-danger">*</span>
+                </label>
+
+                <input type="text"
+                       id="SubCategoryName"
+                       name="SubCategoryName"
+                       value="@Model.SubCategoryName"
+                       class="form-control"
+                       placeholder="Enter subcategory name" />
+
+                <span id="err-SubCategoryName" class="text-danger small"></span>
+            </div>
+
+            <!-- DESCRIPTION -->
+            <div class="mb-3">
+                <label class="form-label">Description</label>
+                <textarea name="Description"
+                          class="form-control"
+                          rows="3">@Model.Description</textarea>
+            </div>
+
+
+            <!-- Image Upload -->
+            <div class="mb-3">
+                <label class="form-label">Sub Category Image</label>
+                <input type="file"
+                       id="ImageFile"
+                       name="ImageFile"
+                       class="form-control"
+                       accept="image/jpeg,image/jpg,image/png" />
+                <span id="err-Image" class="text-danger small"></span>
+
+                @if (!string.IsNullOrEmpty(Model.SubCategoryImage))
+                {
+                    <div class="mt-2">
+                        <small class="text-muted">Current Image:</small><br />
+                        <img src="~/images/subcategory/@Model.SubCategoryImage"
+                             id="imagePreview"
+                             width="120" height="120"
+                             style="object-fit:cover; border-radius:6px; border:1px solid #ddd;"
+                             onerror="this.style.display='none'" />
+                    </div>
+                }
+                else
+                {
+                    <div class="mt-2">
+                        <img id="imagePreview" src="#" width="120" height="120"
+                             style="object-fit:cover; border-radius:6px; border:1px solid #ddd; display:none;" />
+                    </div>
+                }
+            </div>
+
+
+            <!-- IS ACTIVE -->
+            <div class="form-check mb-3">
+                <input type="checkbox"
+                       name="IsActive"
+                       value="true"
+                       id="IsActive"
+                       class="form-check-input"
+                       @(Model.IsActive ? "checked" : "") />
+
+                <label class="form-check-label">Active</label>
+            </div>
+
+            <!-- BUTTONS -->
+            <div>
+                <button type="submit" id="btnSubCategorySubmit" class="btn btn-primary">
+                    <i class="fa fa-save"></i> @(isEdit ? "Update" : "Save")
+                </button>
+
+                <a href="/Admin/SubCategory/Index" class="btn btn-secondary ms-2">
+                    Cancel
+                </a>
+            </div>
+
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script src="~/js/admin/subcategory.js"></script>
+}
