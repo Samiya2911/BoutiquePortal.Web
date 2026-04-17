@@ -50,6 +50,7 @@ namespace BoutiquePortal.Web.Areas.Admin.Controllers
             model.CityCode = Request.Form["CityCode"].ToString();
             model.StateId = int.TryParse(Request.Form["StateId"], out int sid) ? sid : 0;
             model.CityId = int.TryParse(Request.Form["CityId"], out int id) ? id : 0;
+            model.CountryId = int.TryParse(Request.Form["CountryId"], out int cid) ? cid : 0;
             model.IsActive = Request.Form["IsActive"].ToString().Contains("true");
 
             ModelState.Clear();

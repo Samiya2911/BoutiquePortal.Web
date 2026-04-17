@@ -13,7 +13,7 @@
         @Html.AntiForgeryToken()
 
         <input type="hidden" name="CityId" value="@Model.CityId" />
-        <input type="hidden" name="StateId" value="@Model.StateId" />
+        @* <input type="hidden" name="StateId" value="@Model.StateId" /> *@
 
         <div class="card shadow p-4">
 
@@ -70,15 +70,28 @@
                 <label class="form-check-label">Active</label>
             </div>
 
-            <button type="submit" class="btn btn-primary">
-                @(isEdit ? "Update" : "Save")
-            </button>
+            <div class="mt-3">
+                <button type="submit" class="btn btn-primary btn-sm">
+                    @(isEdit ? "Update" : "Save")
+                </button>
 
-            <a href="/Admin/City/Index" class="btn btn-secondary ms-2">Cancel</a>
+                <a href="/Admin/City/Index" class="btn btn-secondary btn-sm ms-2">
+                    Cancel
+                </a>
+            </div>
+
         </div>
     </form>
 </div>
 
 @section Scripts {
+    @if (isEdit)
+    {
+        <script>
+            var selectedCountryId = @Model.CountryId;
+            var selectedStateId = @Model.StateId;
+        </script>
+    }
+
     <script src="~/js/admin/location.js"></script>
 }

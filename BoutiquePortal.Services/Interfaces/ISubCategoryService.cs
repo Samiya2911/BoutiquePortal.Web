@@ -14,5 +14,7 @@ namespace BoutiquePortal.Services.Interfaces
         Task<int> AddAsync(SubCategory entity);
         Task<int> UpdateAsync(SubCategory entity);
         Task<int> DeleteAsync(int id);
+        Task<IEnumerable<SubCategory>> GetByCategoryId(int categoryId);
+
     }
 }

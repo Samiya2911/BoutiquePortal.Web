@@ -20,11 +20,14 @@ builder.Services.AddSession(options =>
 
 //// Dependency Injection (Repositories)
 //builder.Services.AddScoped<IVendorRepository, VendorRepository>();
+
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 builder.Services.AddScoped<ISubCategoryRepository, SubCategoryRepository>();
-//builder.Services.AddScoped<IProductRepository, ProductRepository>();System.IO.InvalidDataException: 'Failed to load configuration from file 'D:\MCA Project\4 10 26 new start\BoutiquePortal.Web\BoutiquePortal.Web\appsettings.json'.'
+builder.Services.AddScoped<IProductRepository, ProductRepository>();  //System.IO.InvalidDataException: 'Failed to load configuration from file 'D:\MCA Project\4 10 26 new start\BoutiquePortal.Web\BoutiquePortal.Web\appsettings.json'.'
+
 //builder.Services.AddScoped<IAuthRepository, AuthRepository>();
 //// builder.Services.AddScoped<ICartRepository, CartRepository>();
+
 builder.Services.AddScoped<ICountryRepository, CountryRepository>();
 builder.Services.AddScoped<IStateRepository, StateRepository>();
 builder.Services.AddScoped<ICityRepository, CityRepository>();
@@ -32,11 +35,14 @@ builder.Services.AddScoped<ICityRepository, CityRepository>();
 
 //// Dependency Injection (Services)
 //builder.Services.AddScoped<IVendorService, VendorService>();
+
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<ISubCategoryService, SubCategoryService>();
-//builder.Services.AddScoped<IProductService, ProductService>();
+builder.Services.AddScoped<IProductService, ProductService>();
+
 //builder.Services.AddScoped<IAuthService, AuthService>();
 //// builder.Services.AddScoped<ICartService, CartService>();
+
 builder.Services.AddScoped<ICountryService, CountryService>();
 builder.Services.AddScoped<IStateService, StateService>();
 builder.Services.AddScoped<ICityService, CityService>();
