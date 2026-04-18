@@ -1,0 +1,120 @@
+﻿@model IEnumerable<BoutiquePortal.Model.Models.Vendor>
+
+@{
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+    ViewBag.Title = "Vendors";
+}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between mb-3">
+        <h2>Vendor List</h2>
+        <a href="/Admin/Vendor/AddEdit" class="btn btn-success">
+            <i class="fa fa-plus"></i> Add Vendor
+        </a>
+    </div>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show">
+            @TempData["Success"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <div class="card shadow">
+        <div class="card-body table-responsive">
+
+            <table class="table table-bordered table-hover align-middle">
+                <thead class="table-dark">
+                    <tr>
+                        <th>#</th>
+                        <th>Vendor Name</th>
+                        <th>Brand</th>
+                        <th>Email</th>
+                        <th>Phone</th>
+                        <th>Address</th>
+                        <th>Location</th>               
+                        <th>Approved</th>
+                        <th>Status</th>
+                        <th>Created</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @if (!Model.Any())
+                    {
+                        <tr>
+                            <td colspan="10" class="text-center">No Data Found</td>
+                        </tr>
+                    }
+                    else
+                    {
+                        int i = 1;
+                        foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>@(i++)</td>
+
+                                <td>@item.VendorName</td>
+
+                                <td>@item.BrandName</td>
+
+                                <td>@item.Email</td>
+
+                                <td>@item.Phone</td>
+
+                                <td>@item.Address</td>
+
+                                <td>
+                                    @(item.CityName ?? "-")
+                                    @if (!string.IsNullOrEmpty(item.StateName))
+                                    {
+                                        <br />
+                                        <small class="text-muted">@item.StateName, @item.CountryName</small>
+                                    }
+                                </td>
+
+                                <td>
+                                    <span class="badge bg-@(item.IsApproved ? "success" : "warning text-dark")">
+                                        @(item.IsApproved ? "Approved" : "Pending")
+                                    </span>
+                                </td>
+
+                                <td>
+                                    <span class="badge bg-@(item.IsActive ? "success" : "danger")">
+                                        @(item.IsActive ? "Active" : "Inactive")
+                                    </span>
+                                </td>
+
+                                <td>@item.CreatedDate.ToString("dd MMM yyyy")</td>
+
+                                <td>
+                                    <a href="/Admin/Vendor/AddEdit/@item.VendorId"
+                                       class="btn btn-sm btn-primary">
+                                        Edit
+                                    </a>
+
+                                    <form action="/Admin/Vendor/Delete"
+                                          method="post"
+                                          class="delete-form d-inline">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="id" value="@item.VendorId" />
+                                        <button type="submit" class="btn btn-sm btn-danger">
+                                            Delete
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/admin/vendor.js"></script>
+}

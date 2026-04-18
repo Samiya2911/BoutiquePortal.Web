@@ -22,7 +22,7 @@
                 <select name="CountryId" id="CountryId" class="form-control">
                     <option value="">-- Select Country --</option>
 
-                    @foreach (var c in ViewBag.Countries)
+                    @foreach (var c in ViewBag.Country)
                     {
                         <option value="@c.CountryId"
                                 selected="@(c.CountryId == Model.CountryId)">

@@ -19,7 +19,7 @@ builder.Services.AddSession(options =>
 
 
 //// Dependency Injection (Repositories)
-//builder.Services.AddScoped<IVendorRepository, VendorRepository>();
+builder.Services.AddScoped<IVendorRepository, VendorRepository>();
 
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 builder.Services.AddScoped<ISubCategoryRepository, SubCategoryRepository>();
@@ -34,7 +34,7 @@ builder.Services.AddScoped<ICityRepository, CityRepository>();
 
 
 //// Dependency Injection (Services)
-//builder.Services.AddScoped<IVendorService, VendorService>();
+builder.Services.AddScoped<IVendorService, VendorService>();
 
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<ISubCategoryService, SubCategoryService>();

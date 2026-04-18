@@ -30,7 +30,7 @@ namespace BoutiquePortal.Web.Areas.Admin.Controllers
         [HttpGet]
         public async Task<IActionResult> AddEdit(int? id)
         {
-            ViewBag.Countries = (await _countryService.GetAllAsync()).ToList();
+            ViewBag.Country = (await _countryService.GetAllAsync()).ToList();
 
             if (id.HasValue && id.Value > 0)
             {
@@ -72,7 +72,7 @@ namespace BoutiquePortal.Web.Areas.Admin.Controllers
 
             if (!ModelState.IsValid)
             {
-                ViewBag.Countries = (await _countryService.GetAllAsync()).ToList();
+                ViewBag.Country = (await _countryService.GetAllAsync()).ToList();
                 return View(model);
             }
 

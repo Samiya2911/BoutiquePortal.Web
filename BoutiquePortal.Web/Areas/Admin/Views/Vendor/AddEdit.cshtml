@@ -1,0 +1,146 @@
+﻿@model BoutiquePortal.Model.Models.Vendor
+@{
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+    bool isEdit = Model.VendorId > 0;
+    ViewBag.Title = isEdit ? "Edit Vendor" : "Add Vendor";
+}
+
+<div class="container mt-4">
+    <h2 class="mb-4">@ViewBag.Title</h2>
+
+    <form method="post" id="VendorForm"
+          asp-area="Admin" asp-controller="Vendor" asp-action="AddEdit">
+        @Html.AntiForgeryToken()
+        <input type="hidden" name="VendorId" value="@Model.VendorId" />
+
+        <div class="card shadow p-4">
+
+            <!-- VENDOR NAME -->
+            <div class="mb-3">
+                <label class="form-label">Vendor Name *</label>
+                <input type="text" id="VendorName" name="VendorName"
+                       value="@Model.VendorName" class="form-control" />
+                <span id="err-VendorName" class="text-danger small"></span>
+            </div>
+
+            <!-- BRAND NAME -->
+            <div class="mb-3">
+                <label class="form-label">Brand Name *</label>
+                <input type="text" id="BrandName" name="BrandName"
+                       value="@Model.BrandName" class="form-control" />
+                <span id="err-BrandName" class="text-danger small"></span>
+            </div>
+
+            <!-- EMAIL -->
+            <div class="mb-3">
+                <label class="form-label">Email *</label>
+                <input type="email" id="Email" name="Email"
+                       value="@Model.Email" class="form-control" />
+                <span id="err-Email" class="text-danger small"></span>
+            </div>
+
+            <!-- PASSWORD -->
+            <div class="mb-3">
+                <label class="form-label">Password *</label>
+                <input type="password" id="Password" name="Password"
+                       value="@Model.Password" class="form-control"
+                       autocomplete="new-password" />
+                <span id="err-Password" class="text-danger small"></span>
+            </div>
+
+            <!-- PHONE -->
+            <div class="mb-3">
+                <label class="form-label">Phone * <small class="text-muted">(must be unique)</small></label>
+                <input type="text" id="Phone" name="Phone"
+                       value="@Model.Phone" class="form-control" />
+                <span id="err-Phone" class="text-danger small"></span>
+            </div>
+
+            <!-- ADDRESS -->
+            <div class="mb-3">
+                <label class="form-label">Address</label>
+                <textarea id="Address" name="Address"
+                          class="form-control" rows="2">@Model.Address</textarea>
+            </div>
+
+            <!-- COUNTRY -->
+            <div class="mb-3">
+                <label class="form-label">Country *</label>
+                <select id="CountryId" name="CountryId" class="form-control">
+                    <option value="">-- Select Country --</option>
+                    @foreach (var c in ViewBag.Country)
+                    {
+                        <option value="@c.CountryId"
+                                selected="@(c.CountryId == Model.CountryId)">
+                            @c.CountryName
+                        </option>
+                    }
+                </select>
+                <span id="err-CountryId" class="text-danger small"></span>
+            </div>
+
+            <!-- STATE (loaded via AJAX) -->
+            <div class="mb-3">
+                <label class="form-label">State *</label>
+                <select id="StateId" name="StateId" class="form-control">
+                    <option value="">-- Select State --</option>
+                </select>
+                <span id="err-StateId" class="text-danger small"></span>
+            </div>
+
+            <!-- CITY (loaded via AJAX) -->
+            <div class="mb-3">
+                <label class="form-label">City *</label>
+                <select id="CityId" name="CityId" class="form-control">
+                    <option value="">-- Select City --</option>
+                </select>
+                <span id="err-CityId" class="text-danger small"></span>
+            </div>
+
+            <!-- IS APPROVED -->
+            <div class="form-check mb-2">
+                <input type="checkbox" name="IsApproved" value="true"
+                       class="form-check-input"
+                       @(Model.IsApproved ? "checked" : "") />
+                <label class="form-check-label">Approved</label>
+            </div>
+
+            <!-- IS ACTIVE -->
+            <div class="form-check mb-3">
+                <input type="checkbox" name="IsActive" value="true"
+                       class="form-check-input"
+                       @(Model.IsActive ? "checked" : "") />
+                <label class="form-check-label">Active</label>
+            </div>
+
+         
+            <!-- BUTTON -->
+            <div class="mt-3">
+                <button type="submit" class="btn btn-primary btn-sm">
+                    @(isEdit ? "Update" : "Save")
+                </button>
+
+                <a href="/Admin/Vendor/Index" class="btn btn-secondary btn-sm ms-2">
+                    Cancel
+                </a>
+            </div>
+        
+        
+        
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    @* ✅ Inject selected IDs so vendor.js can auto-select in edit mode.
+       MUST be defined BEFORE vendor.js loads. *@
+    @if (isEdit)
+    {
+        <script>
+            var selectedCountryId = @Model.CountryId;
+            var selectedStateId   = @Model.StateId;
+            var selectedCityId    = @Model.CityId;
+        </script>
+    }
+    <script src="~/js/admin/vendor.js"></script>
+}

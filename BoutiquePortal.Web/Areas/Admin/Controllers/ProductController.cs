@@ -1,5 +1,6 @@
 ﻿using BoutiquePortal.Model.Models;
 using BoutiquePortal.Services.Interfaces;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BoutiquePortal.Web.Areas.Admin.Controllers
@@ -11,17 +12,20 @@ namespace BoutiquePortal.Web.Areas.Admin.Controllers
         private readonly ICategoryService _categoryService;
         private readonly ISubCategoryService _subCategoryService;
         private readonly IVendorService _vendorService;
+        private readonly IWebHostEnvironment _env;
 
         public ProductController(
             IProductService service,
             ICategoryService categoryService,
             ISubCategoryService subCategoryService,
-            IVendorService vendorService)
+            IVendorService vendorService,
+            IWebHostEnvironment env)
         {
             _service = service;
             _categoryService = categoryService;
             _subCategoryService = subCategoryService;
             _vendorService = vendorService;
+            _env = env;
         }
 
         // ================== INDEX ==================
@@ -61,20 +65,29 @@ namespace BoutiquePortal.Web.Areas.Admin.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> AddEdit(Product model)
         {
-            // Manual binding (same like your Category/City)
+            // Manual binding 
             model.ProductName = Request.Form["ProductName"].ToString().Trim();
-           // model.ProductCode = Request.Form["ProductCode"].ToString();
             model.Description = Request.Form["Description"].ToString();
-
+            model.ProductImage = Request.Form["ProductImage"].ToString();
+            model.BrandName = Request.Form["BrandName"].ToString();  
             model.CategoryId = int.TryParse(Request.Form["CategoryId"], out int cid) ? cid : 0;
-            model.SubCategoryId = int.TryParse(Request.Form["SubCategoryId"], out int sid) ? sid : 0;
-            model.VendorId = int.TryParse(Request.Form["VendorId"], out int vid) ? vid : 0;
+            //model.SubCategoryId = int.TryParse(Request.Form["SubCategoryId"], out int sid) ? sid : 0;
+           
+            //  SubCategoryId is nullable — store null if not selected (not 0)
+            model.SubCategoryId = int.TryParse(Request.Form["SubCategoryId"], out int scid) && scid > 0
+                ? scid
+                : (int?)null;
 
-            model.Price = decimal.TryParse(Request.Form["Price"], out decimal price) ? price : 0;
+
+            model.VendorId = int.TryParse(Request.Form["VendorId"], out int vid) ? vid : 0;   
             model.Quantity = int.TryParse(Request.Form["Quantity"], out int qty) ? qty : 0;
-
             model.ProductId = int.TryParse(Request.Form["ProductId"], out int pid) ? pid : 0;
             model.IsActive = Request.Form["IsActive"].ToString().Contains("true");
+            // model.Price = decimal.TryParse(Request.Form["Price"], out decimal price) ? price : 0;
+            decimal.TryParse(Request.Form["Price"], out decimal price);
+            decimal.TryParse(Request.Form["DiscountPrice"], out decimal discPrice);
+            model.Price = price;
+            model.DiscountPrice = discPrice > 0 ? discPrice : (decimal?)null;
 
             ModelState.Clear();
 
@@ -85,7 +98,7 @@ namespace BoutiquePortal.Web.Areas.Admin.Controllers
             if (model.CategoryId == 0)
                 ModelState.AddModelError("CategoryId", "Category is required");
 
-            if (model.SubCategoryId == 0)
+            if (model.SubCategoryId == null)
                 ModelState.AddModelError("SubCategoryId", "SubCategory is required");
 
             if (model.VendorId == 0)
@@ -107,11 +120,43 @@ namespace BoutiquePortal.Web.Areas.Admin.Controllers
                 return View(model);
             }
 
+            // ================== IMAGE UPLOAD ==================
+            var imageFile = Request.Form.Files["ImageFile"];
+            if (imageFile != null && imageFile.Length > 0)
+            {
+                string folder = Path.Combine(_env.WebRootPath, "images", "product");
+                if (!Directory.Exists(folder))
+                    Directory.CreateDirectory(folder);
+
+                string fileName = Guid.NewGuid() + Path.GetExtension(imageFile.FileName);
+                using (var stream = new FileStream(Path.Combine(folder, fileName), FileMode.Create))
+                {
+                    await imageFile.CopyToAsync(stream);
+                }
+
+                // ✅ Delete old image if updating
+                if (model.ProductId > 0 && !string.IsNullOrEmpty(model.ProductImage))
+                {
+                    var oldPath = Path.Combine(_env.WebRootPath, "images", "product", model.ProductImage);
+                    if (System.IO.File.Exists(oldPath))
+                        System.IO.File.Delete(oldPath);
+                }
+
+                model.ProductImage = fileName;
+            }
+
             // ================== SAVE ==================
             if (model.ProductId == 0)
+            {
+                model.CreatedDate = DateTime.Now;
                 await _service.AddAsync(model);
+                TempData["Success"] = "Product added successfully!";
+            }
             else
+            {
                 await _service.UpdateAsync(model);
+                TempData["Success"] = "Product updated successfully!";
+            }
 
             return RedirectToAction(nameof(Index));
         }
@@ -127,11 +172,32 @@ namespace BoutiquePortal.Web.Areas.Admin.Controllers
 
         // ================== AJAX ==================
 
-        // 🔥 CATEGORY → SUBCATEGORY
-        public async Task<JsonResult> GetSubCategoryByCategory(int categoryId)
+        // ================== AJAX: SubCategories by Category ==================
+        //public async Task<JsonResult> GetSubCategoryByCategory(int categoryId)
+        //{
+        //    var data = await _subCategoryService.GetByCategoryId(categoryId);
+        //    return Json(data);
+        //}
+
+        public async Task<JsonResult> GetSubCategoriesByCategory(int categoryId)
         {
             var data = await _subCategoryService.GetByCategoryId(categoryId);
-            return Json(data);
+
+            var result = data.Select(sc => new
+            {
+                subCategoryId = sc.SubCategoryId,
+                subCategoryName = sc.SubCategoryName
+            });
+
+            return Json(result);
+        }
+
+
+        // ================== AJAX: BrandName by Vendor ==================
+        public async Task<JsonResult> GetVendorBrand(int vendorId)
+        {
+            var vendor = await _vendorService.GetByIdAsync(vendorId);
+            return Json(new { brandName = vendor?.BrandName ?? "" });
         }
     }
 }
