@@ -15,7 +15,7 @@ namespace BoutiquePortal.Services.Interfaces
         Task<int> UpdateAsync(Product product);
         Task<int> DeleteAsync(int id);
 
-        // OPTIONAL
+        Task<IEnumerable<Product>> GetByCategoryId(int categoryId);
         Task<IEnumerable<Product>> GetByVendorId(int vendorId);
     }
 }

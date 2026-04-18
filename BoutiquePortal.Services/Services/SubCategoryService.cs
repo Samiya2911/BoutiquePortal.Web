@@ -23,6 +23,8 @@ namespace BoutiquePortal.Services.Services
         public Task<int> AddAsync(SubCategory entity) => _repo.AddAsync(entity);
         public Task<int> UpdateAsync(SubCategory entity) => _repo.UpdateAsync(entity);
         public Task<int> DeleteAsync(int id) => _repo.DeleteAsync(id);
-        Task<IEnumerable<SubCategory>> GetByCategoryId(int categoryId);
+        public async Task<IEnumerable<SubCategory>> GetByCategoryId(int categoryId)
+            => await _repo.GetByCategoryId(categoryId);
+        
     }
 }

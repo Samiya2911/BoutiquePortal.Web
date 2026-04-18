@@ -82,6 +82,8 @@ namespace BoutiquePortal.Repositories.Repository
             p.Add("@Description", entity.Description);
             p.Add("@CategoryId", entity.CategoryId);
             p.Add("@SubCategoryId", entity.SubCategoryId);
+            p.Add("@VendorId", entity.VendorId);
+            p.Add("@BrandName", entity.BrandName);
             p.Add("@Quantity", entity.Quantity);
             p.Add("@ProductImage", entity.ProductImage);
             p.Add("@IsActive", entity.IsActive);
@@ -101,6 +103,17 @@ namespace BoutiquePortal.Repositories.Repository
             return await conn.ExecuteScalarAsync<int>(
                 "sp_Product_Delete",
                 new { ProductId = id },
+                commandType: CommandType.StoredProcedure
+            );
+        }
+
+        // ================== GET BY CATEGORY (AJAX DROPDOWN) ==================
+        public async Task<IEnumerable<Product>> GetByCategoryId(int categoryId)
+        {
+            using var conn = new SqlConnection(_connectionString);
+            return await conn.QueryAsync<Product>(
+                "sp_Product_GetByCategory",
+                new { CategoryId = categoryId },
                 commandType: CommandType.StoredProcedure
             );
         }

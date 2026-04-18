@@ -7,79 +7,85 @@ using BoutiquePortal.Model.Models;
 using BoutiquePortal.Repositories.Interfaces;
 using Dapper;
 using Microsoft.Data.SqlClient;
-using System.Data;
 using Microsoft.Extensions.Configuration;
-
+using System.Data;
 
 namespace BoutiquePortal.Repositories.Repository
 {
-    public class SubCategoryRepository : ISubCategoryRepository
+    public class VendorRepository : IVendorRepository
     {
         private readonly string _connectionString;
 
-        public SubCategoryRepository(IConfiguration configuration)
+        public VendorRepository(IConfiguration configuration)
         {
             _connectionString = configuration.GetConnectionString("DefaultConnection")!;
         }
 
         // ================== GET ALL ==================
-        public async Task<IEnumerable<SubCategory>> GetAllAsync()
+        public async Task<IEnumerable<Vendor>> GetAllAsync()
         {
             using var conn = new SqlConnection(_connectionString);
-
-            return await conn.QueryAsync<SubCategory>(
-                "sp_GetAllSubCategories",
+            return await conn.QueryAsync<Vendor>(
+                "sp_Vendor_GetAll",
                 commandType: CommandType.StoredProcedure
             );
         }
 
         // ================== GET BY ID ==================
-        public async Task<SubCategory> GetByIdAsync(int id)
+        public async Task<Vendor> GetByIdAsync(int id)
         {
             using var conn = new SqlConnection(_connectionString);
-
-            return await conn.QueryFirstOrDefaultAsync<SubCategory>(
-                "sp_GetSubCategoryById",
-                new { SubCategoryId = id },
+            return await conn.QueryFirstOrDefaultAsync<Vendor>(
+                "sp_Vendor_GetById",
+                new { VendorId = id },
                 commandType: CommandType.StoredProcedure
-            ) ?? new SubCategory();
+            ) ?? new Vendor();
         }
 
         // ================== ADD ==================
-        public async Task<int> AddAsync(SubCategory entity)
+        public async Task<int> AddAsync(Vendor entity)
         {
             using var conn = new SqlConnection(_connectionString);
-
             var p = new DynamicParameters();
-            p.Add("@SubCategoryName", entity.SubCategoryName);
-            p.Add("@Description", entity.Description);
-            p.Add("@SubCategoryImage", entity.SubCategoryImage);
-            p.Add("@CategoryId", entity.CategoryId);
+            p.Add("@VendorName", entity.VendorName);
+            p.Add("@Email", entity.Email);
+            p.Add("@Password", entity.Password);
+            p.Add("@BrandName", entity.BrandName);
+            p.Add("@Phone", entity.Phone);
+            p.Add("@Address", entity.Address);
+            p.Add("@CountryId", entity.CountryId);
+            p.Add("@StateId", entity.StateId);
+            p.Add("@CityId", entity.CityId);
+            p.Add("@IsApproved", entity.IsApproved);
             p.Add("@IsActive", entity.IsActive);
-            p.Add("@CreatedDate", entity.CreatedDate);
 
             return await conn.ExecuteScalarAsync<int>(
-                "sp_AddSubCategory",
+                "sp_Vendor_Insert",
                 p,
                 commandType: CommandType.StoredProcedure
             );
         }
 
         // ================== UPDATE ==================
-        public async Task<int> UpdateAsync(SubCategory entity)
+        public async Task<int> UpdateAsync(Vendor entity)
         {
             using var conn = new SqlConnection(_connectionString);
-
             var p = new DynamicParameters();
-            p.Add("@SubCategoryId", entity.SubCategoryId);
-            p.Add("@SubCategoryName", entity.SubCategoryName);
-            p.Add("@Description", entity.Description);
-            p.Add("@SubCategoryImage", entity.SubCategoryImage);
-            p.Add("@CategoryId", entity.CategoryId);
+            p.Add("@VendorId", entity.VendorId);
+            p.Add("@VendorName", entity.VendorName);
+            p.Add("@Email", entity.Email);
+            p.Add("@Password", entity.Password);
+            p.Add("@BrandName", entity.BrandName);
+            p.Add("@Phone", entity.Phone);
+            p.Add("@Address", entity.Address);
+            p.Add("@CountryId", entity.CountryId);
+            p.Add("@StateId", entity.StateId);
+            p.Add("@CityId", entity.CityId);
+            p.Add("@IsApproved", entity.IsApproved);
             p.Add("@IsActive", entity.IsActive);
 
             return await conn.ExecuteScalarAsync<int>(
-                "sp_UpdateSubCategory",
+                "sp_Vendor_Update",
                 p,
                 commandType: CommandType.StoredProcedure
             );
@@ -89,20 +95,9 @@ namespace BoutiquePortal.Repositories.Repository
         public async Task<int> DeleteAsync(int id)
         {
             using var conn = new SqlConnection(_connectionString);
-
             return await conn.ExecuteScalarAsync<int>(
-                "sp_DeleteSubCategory",
-                new { SubCategoryId = id },
-                commandType: CommandType.StoredProcedure
-            );
-        }
-
-        public async Task<IEnumerable<SubCategory>> GetByCategoryId(int categoryId)
-        {
-            using var conn = new SqlConnection(_connectionString);
-            return await conn.QueryAsync<SubCategory>(
-                "sp_SubCategory_GetByCategory",
-                new { CategoryId = categoryId },
+                "sp_Vendor_Delete",
+                new { VendorId = id },
                 commandType: CommandType.StoredProcedure
             );
         }

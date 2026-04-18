@@ -28,6 +28,9 @@ namespace BoutiquePortal.Services.Services
 
         public Task<int> DeleteAsync(int id) => _repo.DeleteAsync(id);
 
+        public async Task<IEnumerable<Product>> GetByCategoryId(int categoryId)
+            => await _repo.GetByCategoryId(categoryId);
+
         public async Task<IEnumerable<Product>> GetByVendorId(int vendorId)
         {
             return await _repo.GetByVendorId(vendorId);
