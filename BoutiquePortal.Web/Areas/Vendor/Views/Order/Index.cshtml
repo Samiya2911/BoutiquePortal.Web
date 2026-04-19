@@ -1,0 +1,161 @@
+﻿@model IEnumerable<BoutiquePortal.Model.ViewModels.VendorOrderVM>
+@{
+    Layout = "~/Areas/Vendor/Views/Shared/_VendorLayout.cshtml";
+    ViewBag.Title = "My Orders";
+}
+
+<div class="pagetitle">
+    <h1>My Orders</h1>
+    <nav>
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="/Vendor/Dashboard">Dashboard</a></li>
+            <li class="breadcrumb-item active">Orders</li>
+        </ol>
+    </nav>
+</div>
+
+<section class="section">
+    <div class="card shadow">
+        <div class="card-body">
+            <h5 class="card-title">Order List</h5>
+
+            <!-- ================== SEARCH + FILTER BAR ================== -->
+            <div class="row mb-3">
+                <div class="col-md-4">
+                    <input type="text"
+                           id="orderSearch"
+                           class="form-control"
+                           placeholder="🔍 Search orders..." />
+                </div>
+                <div class="col-md-3">
+                    <select id="statusFilter" class="form-control">
+                        <option value="">-- All Statuses --</option>
+                        <option value="pending">Pending</option>
+                        <option value="confirmed">Confirmed</option>
+                        <option value="shipped">Shipped</option>
+                        <option value="delivered">Delivered</option>
+                        <option value="cancelled">Cancelled</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <select id="dateFilter" class="form-control">
+                        <option value="">-- All Dates --</option>
+                        <option value="today">Today</option>
+                        <option value="week">This Week</option>
+                        <option value="month">This Month</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- ================== TABLE ================== -->
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover align-middle">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>#</th>
+                            <th>Order ID</th>
+                            <th>Product</th>
+                            <th>Customer</th>
+                            <th>Qty</th>
+                            <th>Amount</th>
+                            <th>Order Status</th>
+                            <th>Payment</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        @if (!Model.Any())
+                        {
+                            <tr>
+                                <td colspan="9" class="text-center">No orders yet</td>
+                            </tr>
+                        }
+                        else
+                        {
+                            int i = 1;
+                            foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td>@(i++)</td>
+
+                                    <td><strong>#@item.OrderId</strong></td>
+
+                                    <td>
+                                        <div class="d-flex align-items-center gap-2">
+                                            @if (!string.IsNullOrEmpty(item.ImagePath))
+                                            {
+                                                <img src="~/images/product/@item.ImagePath"
+                                                     width="45" height="45"
+                                                     style="object-fit:cover; border-radius:6px;"
+                                                     onerror="this.style.display='none'" />
+                                            }
+                                            <span>@item.ProductName</span>
+                                        </div>
+                                    </td>
+
+                                    <td>
+                                        @item.CustomerName
+                                        <br />
+                                        <small class="text-muted">@item.ShippingCity</small>
+                                    </td>
+
+                                    <td>@item.Quantity</td>
+
+                                    <td>
+                                        <strong>&#8377;@item.TotalPrice.ToString("N2")</strong>
+                                    </td>
+
+                                    <td>
+                                        <!-- ✅ added order-status-badge class -->
+                                        <span class="badge order-status-badge
+                                                      bg-@GetStatusColor(item.OrderStatus)">
+                                            @item.OrderStatus
+                                        </span>
+                                    </td>
+
+                                    <td>
+                                        <span class="badge bg-@GetPayColor(item.PaymentStatus)">
+                                            @item.PaymentStatus
+                                        </span>
+                                    </td>
+
+                                    <!-- ✅ added order-date-cell class + data-date attribute -->
+                                    <td class="order-date-cell"
+                                        data-date="@item.OrderDate.ToString("yyyy-MM-dd")">
+                                        @item.OrderDate.ToString("dd MMM yyyy")
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+@functions {
+    string GetStatusColor(string s) => s switch
+    {
+        "Pending" => "warning text-dark",
+        "Confirmed" => "primary",
+        "Shipped" => "info text-dark",
+        "Delivered" => "success",
+        "Cancelled" => "danger",
+        _ => "secondary"
+    };
+
+    string GetPayColor(string s) => s switch
+    {
+        "Paid" => "success",
+        "Pending" => "warning text-dark",
+        "Failed" => "danger",
+        _ => "secondary"
+    };
+}
+
+@section Scripts {
+    <script src="~/js/vendor/order.js"></script>
+}

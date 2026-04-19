@@ -1,0 +1,246 @@
+﻿@model BoutiquePortal.Model.Models.Order
+@{
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+    ViewBag.Title = "Order Details";
+}
+
+<div class="pagetitle">
+    <h1>Order #@Model.OrderId</h1>
+    <nav>
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="/Admin/Order">Orders</a></li>
+            <li class="breadcrumb-item active">Details</li>
+        </ol>
+    </nav>
+</div>
+
+<section class="section">
+    <div class="row">
+
+        <!-- ================== LEFT COLUMN ================== -->
+        <div class="col-md-4">
+
+            <!-- Customer Info -->
+            <div class="card shadow mb-3">
+                <div class="card-body">
+                    <h5 class="card-title">👤 Customer Info</h5>
+                    <p class="mb-1"><strong>Name:</strong> @Model.CustomerName</p>
+                    <p class="mb-1"><strong>Email:</strong> @Model.CustomerEmail</p>
+                    <p class="mb-0"><strong>Phone:</strong> @Model.CustomerPhone</p>
+                </div>
+            </div>
+
+            <!-- Shipping Info -->
+            <div class="card shadow mb-3">
+                <div class="card-body">
+                    <h5 class="card-title">📦 Shipping Info</h5>
+                    <p class="mb-1"><strong>Name:</strong> @Model.ShippingName</p>
+                    <p class="mb-1"><strong>Phone:</strong> @Model.ShippingPhone</p>
+                    <p class="mb-1"><strong>Address:</strong> @Model.ShippingAddress</p>
+                    <p class="mb-0">
+                        @Model.ShippingCity, @Model.ShippingState — @Model.ShippingPincode
+                    </p>
+                </div>
+            </div>
+
+            <!-- Payment Info -->
+            <div class="card shadow mb-3">
+                <div class="card-body">
+                    <h5 class="card-title">💳 Payment Info</h5>
+                    <p class="mb-1"><strong>Method:</strong> @Model.PaymentMethod</p>
+                    <p class="mb-1">
+                        <strong>Status:</strong>
+                        <span class="badge bg-@(Model.PaymentStatus == "Paid" ? "success" : "warning text-dark")">
+                            @Model.PaymentStatus
+                        </span>
+                    </p>
+                    @if (!string.IsNullOrEmpty(Model.TransactionId))
+                    {
+                        <p class="mb-0">
+                            <strong>Transaction ID:</strong> @Model.TransactionId
+                        </p>
+                    }
+                </div>
+            </div>
+
+            <!-- Order Info -->
+            <div class="card shadow mb-3">
+                <div class="card-body">
+                    <h5 class="card-title">🧾 Order Info</h5>
+                    <p class="mb-1">
+                        <strong>Order Date:</strong>
+                        @Model.OrderDate.ToString("dd MMM yyyy, hh:mm tt")
+                    </p>
+                    <p class="mb-1">
+                        <strong>Order Status:</strong>
+                        <span class="badge bg-@GetOrderStatusColor(Model.OrderStatus)">
+                            @Model.OrderStatus
+                        </span>
+                    </p>
+                    <p class="mb-0">
+                        <strong>Grand Total:</strong>
+                        <span class="text-success fw-bold">
+                            &#8377;@Model.TotalAmount.ToString("N2")
+                        </span>
+                    </p>
+                </div>
+            </div>
+
+            <!-- Update Status -->
+            <div class="card shadow">
+                <div class="card-body">
+                    <h5 class="card-title">🔄 Update Status</h5>
+                    <form asp-area="Admin" asp-controller="Order"
+                          asp-action="UpdateStatus" method="post">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="orderId" value="@Model.OrderId" />
+
+                        <div class="mb-3">
+                            <label class="form-label">Order Status</label>
+                            <select name="orderStatus" class="form-control">
+                                @foreach (var s in new[]
+                                                                {
+                                                                "Pending", "Confirmed",
+                                                                "Shipped", "Delivered", "Cancelled"
+                                                                })
+                                {
+                                    <option value="@s"
+                                            selected="@(Model.OrderStatus == s)">
+                                        @s
+                                    </option>
+                                }
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Payment Status</label>
+                            <select name="paymentStatus" class="form-control">
+                                @foreach (var s in new[]
+                                                                {
+                                                                "Pending", "Paid", "Failed"
+                                                                })
+                                {
+                                    <option value="@s"
+                                            selected="@(Model.PaymentStatus == s)">
+                                        @s
+                                    </option>
+                                }
+                            </select>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="bi bi-check-circle"></i> Update Status
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- ================== RIGHT COLUMN — Order Items ================== -->
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-body">
+                    <h5 class="card-title">🛒 Order Items</h5>
+
+                    <div class="table-responsive">
+                        <table class="table table-bordered align-middle">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>Image</th>
+                                    <th>Product</th>
+                                    <th>Vendor</th>
+                                    <th>Qty</th>
+                                    <th>Unit Price</th>
+                                    <th>Total</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                @if (Model.Items == null || !Model.Items.Any())
+                                {
+                                    <tr>
+                                        <td colspan="6" class="text-center text-muted">
+                                            No items found
+                                        </td>
+                                    </tr>
+                                }
+                                else
+                                {
+                                    foreach (var item in Model.Items)
+                                    {
+                                        <tr>
+                                            <td>
+                                                @if (!string.IsNullOrEmpty(item.ImagePath))
+                                                {
+                                                    <!-- ✅ FIXED: matches your image storage pattern -->
+                                                    <img src="~/images/product/@item.ImagePath"
+                                                         width="55" height="55"
+                                                         style="object-fit:cover; border-radius:6px;"
+                                                         onerror="this.style.display='none'" />
+                                                }
+                                                else
+                                                {
+                                                    <span class="text-muted small">No image</span>
+                                                }
+                                            </td>
+
+                                            <td>
+                                                <strong>@item.ProductName</strong>
+                                            </td>
+
+                                            <td>
+                                                @item.VendorName
+                                                <br />
+                                                <small class="text-muted">@item.BrandName</small>
+                                            </td>
+
+                                            <td>@item.Quantity</td>
+
+                                            <td>&#8377;@item.UnitPrice.ToString("N2")</td>
+
+                                            <td>
+                                                <strong>&#8377;@item.TotalPrice.ToString("N2")</strong>
+                                            </td>
+                                        </tr>
+                                    }
+                                }
+                            </tbody>
+
+                            <tfoot>
+                                <tr class="table-success">
+                                    <td colspan="5" class="text-end fw-bold fs-6">
+                                        Grand Total:
+                                    </td>
+                                    <td>
+                                        <strong class="fs-6">
+                                            &#8377;@Model.TotalAmount.ToString("N2")
+                                        </strong>
+                                    </td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+
+                    <a href="/Admin/Order" class="btn btn-secondary btn-sm mt-2">
+                        <i class="bi bi-arrow-left"></i> Back to Orders
+                    </a>
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+</section>
+
+@functions {
+    string GetOrderStatusColor(string status) => status switch
+    {
+        "Pending" => "warning text-dark",
+        "Confirmed" => "primary",
+        "Shipped" => "info text-dark",
+        "Delivered" => "success",
+        "Cancelled" => "danger",
+        _ => "secondary"
+    };
+}

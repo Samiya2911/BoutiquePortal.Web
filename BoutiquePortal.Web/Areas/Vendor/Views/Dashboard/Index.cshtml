@@ -1,0 +1,64 @@
+﻿@{
+    Layout = "~/Areas/Vendor/Views/Shared/_VendorLayout.cshtml";
+    ViewBag.Title = "Dashboard";
+}
+
+<div class="pagetitle">
+    <h1>Welcome, @Context.Session.GetString("VendorName") 👋</h1>
+    <nav><ol class="breadcrumb"><li class="breadcrumb-item active">Dashboard</li></ol></nav>
+</div>
+
+<section class="section dashboard">
+    <div class="row">
+
+        <div class="col-md-3">
+            <div class="card info-card sales-card">
+                <div class="card-body">
+                    <h5 class="card-title">Total Products</h5>
+                    <div class="d-flex align-items-center">
+                        <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                            <i class="bi bi-box"></i>
+                        </div>
+                        <div class="ps-3">
+                            <h6>@ViewBag.TotalProducts</h6>
+                            <span class="text-success small">@ViewBag.ActiveProducts Active</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card info-card revenue-card">
+                <div class="card-body">
+                    <h5 class="card-title">My Orders</h5>
+                    <div class="d-flex align-items-center">
+                        <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                            <i class="bi bi-cart"></i>
+                        </div>
+                        <div class="ps-3">
+                            <a href="/Vendor/Order" class="btn btn-sm btn-outline-primary">View Orders</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card info-card customers-card">
+                <div class="card-body">
+                    <h5 class="card-title">Earnings</h5>
+                    <div class="d-flex align-items-center">
+                        <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                            <i class="bi bi-cash-coin"></i>
+                        </div>
+                        <div class="ps-3">
+                            <a href="/Vendor/Earnings" class="btn btn-sm btn-outline-success">View Earnings</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</section>

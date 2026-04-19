@@ -1,0 +1,223 @@
+﻿@model BoutiquePortal.Model.Models.Product
+
+@{
+    Layout = "~/Areas/Vendor/Views/Shared/_VendorLayout.cshtml";
+    bool isEdit = Model.ProductId > 0;
+    ViewBag.Title = isEdit ? "Edit Product" : "Add Product";
+}
+
+<div class="container mt-4">
+    <h2 class="mb-4">@ViewBag.Title</h2>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show">
+            @TempData["Success"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <form method="post"
+          id="ProductForm"
+          enctype="multipart/form-data"
+          asp-area="Vendor"
+          asp-controller="Product"
+          asp-action="AddEdit">
+
+        @Html.AntiForgeryToken()
+
+        <input type="hidden" name="ProductId" value="@Model.ProductId" />
+        <input type="hidden" name="ProductImage" value="@Model.ProductImage" />
+
+        <div class="card shadow p-4">
+
+            <!-- PRODUCT NAME -->
+            <div class="mb-3">
+                <label class="form-label">
+                    Product Name <span class="text-danger">*</span>
+                </label>
+                <input type="text"
+                       id="ProductName"
+                       name="ProductName"
+                       value="@Model.ProductName"
+                       class="form-control"
+                       placeholder="Enter product name" />
+                <span id="err-ProductName" class="text-danger small"></span>
+            </div>
+
+            <!-- CATEGORY -->
+            <div class="mb-3">
+                <label class="form-label">
+                    Category <span class="text-danger">*</span>
+                </label>
+                <select id="CategoryId" name="CategoryId" class="form-control">
+                    <option value="">-- Select Category --</option>
+                    @if (ViewBag.Categories != null)
+                    {
+                        foreach (var c in ViewBag.Categories)
+                        {
+                            <option value="@c.CategoryId"
+                                    selected="@(c.CategoryId == Model.CategoryId)">
+                                @c.CategoryName
+                            </option>
+                        }
+                    }
+                </select>
+                <span id="err-CategoryId" class="text-danger small"></span>
+            </div>
+
+            <!-- SUB CATEGORY (loaded via AJAX) -->
+            <div class="mb-3">
+                <label class="form-label">
+                    Sub Category <span class="text-danger">*</span>
+                </label>
+                <select id="SubCategoryId" name="SubCategoryId" class="form-control">
+                    <option value="">-- Select Sub Category --</option>
+                    @* Edit mode: pre-populated from ViewBag.SubCategories *@
+                    @if (ViewBag.SubCategories != null)
+                    {
+                        foreach (var sc in ViewBag.SubCategories)
+                        {
+                            <option value="@sc.SubCategoryId"
+                                    selected="@(sc.SubCategoryId == Model.SubCategoryId)">
+                                @sc.SubCategoryName
+                            </option>
+                        }
+                    }
+                </select>
+                <span id="err-SubCategoryId" class="text-danger small"></span>
+            </div>
+
+            <!-- BRAND NAME (read only - from session/vendor profile) -->
+            <div class="mb-3">
+                <label class="form-label">Brand Name</label>
+                <input type="text"
+                       id="BrandName"
+                       name="BrandName"
+                       value="@Model.BrandName"
+                       class="form-control"
+                       readonly
+                       placeholder="From your vendor profile" />
+                <small class="text-muted">
+                    Auto-filled from your brand —
+                    cannot be changed here
+                </small>
+            </div>
+
+            <!-- PRICE & DISCOUNT PRICE -->
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">
+                        Price (&#8377;) <span class="text-danger">*</span>
+                    </label>
+                    <input type="number"
+                           step="0.01"
+                           id="Price"
+                           name="Price"
+                           value="@Model.Price"
+                           class="form-control"
+                           placeholder="0.00" />
+                    <span id="err-Price" class="text-danger small"></span>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Discount Price (&#8377;)</label>
+                    <input type="number"
+                           step="0.01"
+                           id="DiscountPrice"
+                           name="DiscountPrice"
+                           value="@Model.DiscountPrice"
+                           class="form-control"
+                           placeholder="0.00 (optional)" />
+                </div>
+            </div>
+
+            <!-- QUANTITY -->
+            <div class="mb-3">
+                <label class="form-label">Quantity</label>
+                <input type="number"
+                       id="Quantity"
+                       name="Quantity"
+                       value="@Model.Quantity"
+                       class="form-control"
+                       placeholder="0" />
+                <span id="err-Quantity" class="text-danger small"></span>
+            </div>
+
+            <!-- DESCRIPTION -->
+            <div class="mb-3">
+                <label class="form-label">Description</label>
+                <textarea id="Description"
+                          name="Description"
+                          class="form-control"
+                          rows="3"
+                          placeholder="Enter product description">@Model.Description</textarea>
+            </div>
+
+            <!-- IMAGE UPLOAD -->
+            <div class="mb-3">
+                <label class="form-label">Product Image</label>
+                <input type="file"
+                       id="ImageFile"
+                       name="ImageFile"
+                       class="form-control"
+                       accept="image/jpeg,image/jpg,image/png" />
+                <span id="err-Image" class="text-danger small"></span>
+
+                @if (!string.IsNullOrEmpty(Model.ProductImage))
+                {
+                    <div class="mt-2">
+                        <small class="text-muted">Current Image:</small><br />
+                        <img src="~/images/product/@Model.ProductImage"
+                             id="imagePreview"
+                             width="120" height="120"
+                             style="object-fit:cover; border-radius:6px; border:1px solid #ddd;"
+                             onerror="this.style.display='none'" />
+                    </div>
+                }
+                else
+                {
+                    <div class="mt-2">
+                        <img id="imagePreview" src="#" width="120" height="120"
+                             style="object-fit:cover; border-radius:6px;
+                                        border:1px solid #ddd; display:none;" />
+                    </div>
+                }
+            </div>
+
+            <!-- IS ACTIVE -->
+            <div class="form-check mb-3">
+                <input type="checkbox"
+                       name="IsActive"
+                       value="true"
+                       id="IsActive"
+                       class="form-check-input"
+                       @(Model.IsActive ? "checked" : "") />
+                <label class="form-check-label">Active</label>
+            </div>
+
+            <!-- BUTTONS -->
+            <div class="mt-3">
+                <button type="submit" class="btn btn-primary btn-sm">
+                    @(isEdit ? "Update" : "Save")
+                </button>
+                <a href="/Vendor/Product/Index" class="btn btn-secondary btn-sm ms-2">
+                    Cancel
+                </a>
+            </div>
+
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    @* Inject edit-mode IDs BEFORE product.js — same pattern as Admin *@
+    @if (isEdit)
+    {
+        <script>
+            var selectedCategoryId    = @Model.CategoryId;
+            var selectedSubCategoryId = @(Model.SubCategoryId.HasValue? Model.SubCategoryId.Value.ToString() : "0");
+        </script>
+    }
+    <script src="~/js/vendor/product.js"></script>
+}

@@ -1,0 +1,130 @@
+﻿@model BoutiquePortal.Model.ViewModels.AdminLoginVM
+@{
+    Layout = null;
+}
+
+@* @if (TempData["Debug"] != null)
+{
+    <div class="alert alert-warning mt-2">
+        🔍 Debug: @TempData["Debug"]
+    </div>
+} *@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Admin Login — Boutique</title>
+    <link href="~/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
+    <style>
+        body {
+            background: linear-gradient(135deg,#1a1a2e,#16213e);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .card {
+            border-radius: 16px;
+            border: none;
+            box-shadow: 0 20px 50px rgba(0,0,0,.4);
+            max-width: 400px;
+            width: 100%;
+        }
+
+        .card-header {
+            background: linear-gradient(135deg,#1a1a2e,#16213e);
+            color: white;
+            border-radius: 16px 16px 0 0 !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <div class="card-header p-4 text-center">
+            <h4 class="mb-0">🛡️ Admin Login</h4>
+            <small class="opacity-75">Boutique Portal Administration</small>
+        </div>
+        <div class="card-body p-4">
+            <form asp-area="Admin" asp-controller="AdminAccount" asp-action="Login" method="post">
+                @Html.AntiForgeryToken()
+
+                <div class="mb-3">
+                    <label asp-for="Email" class="form-label">Email Address</label>
+                    <input asp-for="Email" class="form-control" placeholder="admin@boutique.com" />
+                    <span asp-validation-for="Email" class="text-danger small"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Password" class="form-label">Password</label>
+                    <input asp-for="Password" class="form-control" placeholder="••••••••" />
+                    <span asp-validation-for="Password" class="text-danger small"></span>
+                </div>
+
+                @Html.ValidationSummary(true, "", new { @class = "text-danger small" })
+
+                <button type="submit" class="btn btn-dark w-100 mt-2">Login</button>
+                <a href="/" class="btn btn-link w-100 text-center small mt-1">← Back to Portal</a>
+            </form>
+        </div>
+    </div>
+</body>
+</html>
+
+
+@* @model BoutiquePortal.Model.ViewModels.AdminLoginVM
+
+@{
+    ViewData["Title"] = "Admin Login";  
+    Layout = null;
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <title>Admin Login Boutique </title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
+    <style>
+        body {
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+        }
+        .card { border-radius: 14px; border: none; box-shadow: 0 10px 40px rgba(0,0,0,0.4); }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-4">
+            <div class="card p-4">
+                <div class="card-body">
+                    <h4 class="text-center fw-bold mb-1">🛡️ Admin Login</h4>
+                    <p class="text-center text-muted small mb-4">Access the admin panel</p>
+
+                    <form asp-action="Login" method="post">
+                        <div class="mb-3">
+                            <label asp-for="Email" class="form-label">Email</label>
+                            <input asp-for="Email" class="form-control" placeholder="admin@email.com"/>
+                            <span asp-validation-for="Email" class="text-danger small"></span>
+                        </div>
+                        <div class="mb-3">
+                            <label asp-for="Password" class="form-label">Password</label>
+                            <input asp-for="Password" class="form-control" placeholder="••••••••"/>
+                            <span asp-validation-for="Password" class="text-danger small"></span>
+                        </div>
+
+                        @Html.ValidationSummary(true, "", new { @class = "text-danger small" })
+
+                        <button type="submit" class="btn btn-primary w-100 mt-2">Login</button>
+                        <a href="/" class="btn btn-link w-100 text-center mt-2 small">← Back to Login Options</a>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html> *@

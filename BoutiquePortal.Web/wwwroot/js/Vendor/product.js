@@ -5,8 +5,6 @@
 
         var categoryDropdown = document.getElementById('CategoryId');
         var subCategoryDropdown = document.getElementById('SubCategoryId');
-        var vendorDropdown = document.getElementById('VendorId');
-        var brandInput = document.getElementById('BrandName');
 
         // ================== FORM VALIDATION ==================
         var form = document.getElementById('ProductForm');
@@ -42,11 +40,6 @@
                     valid = false;
                 }
 
-                if (vendorDropdown && !vendorDropdown.value) {
-                    document.getElementById('err-VendorId').textContent = 'Please select a vendor';
-                    valid = false;
-                }
-
                 if (!valid) {
                     e.preventDefault();
                     return false;
@@ -54,29 +47,25 @@
             });
         }
 
-        // ================== IMAGE PREVIEW ON FILE SELECT ==================
+        // ================== IMAGE PREVIEW ==================
         var imageFileInput = document.getElementById('ImageFile');
         var imagePreview = document.getElementById('imagePreview');
 
         if (imageFileInput) {
             imageFileInput.addEventListener('change', function () {
-
                 var file = this.files[0];
-
                 if (file && imagePreview) {
                     var reader = new FileReader();
-
                     reader.onload = function (e) {
                         imagePreview.src = e.target.result;
                         imagePreview.style.display = 'block';
                     };
-
                     reader.readAsDataURL(file);
                 }
             });
         }
 
-        // ================== CATEGORY → SUB CATEGORY (ON CHANGE) ==================
+        // ================== CATEGORY → SUB CATEGORY ==================
         if (categoryDropdown) {
             categoryDropdown.addEventListener('change', function () {
 
@@ -91,12 +80,12 @@
                     return;
                 }
 
-                fetch('/Admin/Product/GetSubCategoriesByCategory?categoryId=' + categoryId)
+                // ✅ Vendor area AJAX endpoint
+                fetch('/Vendor/Product/GetSubCategoriesByCategory?categoryId=' + categoryId)
                     .then(res => res.json())
                     .then(data => {
 
                         var options = '<option value="">-- Select Sub Category --</option>';
-
                         data.forEach(sc => {
                             var id = sc.SubCategoryId || sc.subCategoryId;
                             var name = sc.SubCategoryName || sc.subCategoryName;
@@ -113,28 +102,6 @@
             });
         }
 
-        // ================== VENDOR → BRAND NAME (ON CHANGE) ==================
-        if (vendorDropdown) {
-            vendorDropdown.addEventListener('change', function () {
-
-                var vendorId = this.value;
-
-                if (!vendorId) {
-                    brandInput.value = '';
-                    return;
-                }
-
-                fetch('/Admin/Product/GetVendorBrand?vendorId=' + vendorId)
-                    .then(res => res.json())
-                    .then(data => {
-                        brandInput.value = data.brandName || data.BrandName || '';
-                    })
-                    .catch(() => {
-                        brandInput.value = '';
-                    });
-            });
-        }
-
         // ================== EDIT MODE: AUTO SELECT CATEGORY + SUB CATEGORY ==================
         if (typeof selectedCategoryId !== 'undefined' && selectedCategoryId) {
 
@@ -142,12 +109,11 @@
                 categoryDropdown.value = selectedCategoryId;
             }
 
-            fetch('/Admin/Product/GetSubCategoriesByCategory?categoryId=' + selectedCategoryId)
+            fetch('/Vendor/Product/GetSubCategoriesByCategory?categoryId=' + selectedCategoryId)
                 .then(res => res.json())
                 .then(data => {
 
                     var options = '<option value="">-- Select Sub Category --</option>';
-
                     data.forEach(sc => {
                         var id = sc.SubCategoryId || sc.subCategoryId;
                         var name = sc.SubCategoryName || sc.subCategoryName;
@@ -162,22 +128,6 @@
                     subCategoryDropdown.innerHTML = options;
                     subCategoryDropdown.disabled = false;
                 });
-        }
-
-        // ================== EDIT MODE: AUTO FILL BRAND NAME ==================
-        if (typeof selectedVendorId !== 'undefined' && selectedVendorId) {
-
-            if (vendorDropdown) {
-                vendorDropdown.value = selectedVendorId;
-            }
-
-            if (brandInput && !brandInput.value) {
-                fetch('/Admin/Product/GetVendorBrand?vendorId=' + selectedVendorId)
-                    .then(res => res.json())
-                    .then(data => {
-                        brandInput.value = data.brandName || data.BrandName || '';
-                    });
-            }
         }
 
         // ================== DELETE (AJAX) ==================

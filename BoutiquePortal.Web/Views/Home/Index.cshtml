@@ -1,4 +1,4 @@
-﻿@{
+﻿@* @{
     ViewData["Title"] = "Home Page";
 }
 
@@ -6,3 +6,94 @@
     <h1 class="display-4">Welcome</h1>
     <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
 </div>
+
+
+
+ *@
+
+
+@{
+    ViewData["Title"] = "Login";
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>Login - Select Role</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+        }
+
+        .login-card {
+            border: none;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        .role-btn {
+            border-radius: 10px;
+            padding: 16px;
+            font-size: 16px;
+            font-weight: 600;
+            transition: transform 0.2s;
+        }
+
+            .role-btn:hover {
+                transform: translateY(-3px);
+            }
+
+        .role-icon {
+            font-size: 2rem;
+            display: block;
+            margin-bottom: 6px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-5">
+                <div class="card login-card p-4">
+                    <div class="card-body text-center">
+                        <h3 class="mb-1 fw-bold">Welcome Back 👋</h3>
+                        <p class="text-muted mb-4">Please select how you want to login</p>
+
+                        <div class="d-grid gap-3">
+                            <!-- Admin Login -->
+                            <a href="/Admin/AdminAccount/Login"
+                               class="btn btn-primary role-btn">
+                                <span class="role-icon">🛡️</span>
+                                Admin Login
+                            </a>
+
+                            <!-- Vendor Login -->
+                            <a href="/Vendor/VendorAccount/Login"
+                               class="btn btn-success role-btn">
+                                <span class="role-icon">🏪</span>
+                                Vendor Login
+                            </a>
+
+                            <!-- Vendor Registration -->
+                            <a href="/Vendor/VendorAccount/Register"
+                               class="btn btn-outline-secondary role-btn">
+                                <span class="role-icon">📝</span>
+                                Vendor Registration
+                            </a>
+                        </div>
+
+                        <p class="mt-4 text-muted small">
+                            New vendor? Register and wait for admin approval.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

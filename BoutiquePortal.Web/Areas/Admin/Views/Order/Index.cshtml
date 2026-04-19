@@ -1,0 +1,164 @@
+﻿@model IEnumerable<BoutiquePortal.Model.Models.Order>
+@{
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+    ViewBag.Title = "Orders";
+}
+
+<div class="pagetitle">
+    <h1>All Orders</h1>
+    <nav>
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="/Admin/Dashboard">Dashboard</a></li>
+            <li class="breadcrumb-item active">Orders</li>
+        </ol>
+    </nav>
+</div>
+
+<section class="section">
+    <div class="card shadow">
+        <div class="card-body">
+            <h5 class="card-title">Order List</h5>
+
+            @if (TempData["Success"] != null)
+            {
+                <div class="alert alert-success alert-dismissible fade show">
+                    @TempData["Success"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            }
+
+            <!-- ================== SEARCH + FILTER BAR ================== -->
+            <div class="row mb-3">
+                <div class="col-md-5">
+                    <input type="text"
+                           id="orderSearch"
+                           class="form-control"
+                           placeholder="🔍 Search by customer, order ID..." />
+                </div>
+                <div class="col-md-3">
+                    <select id="statusFilter" class="form-control">
+                        <option value="">-- All Statuses --</option>
+                        <option value="pending">Pending</option>
+                        <option value="confirmed">Confirmed</option>
+                        <option value="shipped">Shipped</option>
+                        <option value="delivered">Delivered</option>
+                        <option value="cancelled">Cancelled</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- ================== TABLE ================== -->
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover align-middle">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>#</th>
+                            <th>Order ID</th>
+                            <th>Customer</th>
+                            <th>Amount</th>
+                            <th>Payment</th>
+                            <th>Order Status</th>
+                            <th>Payment Status</th>
+                            <th>Date</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        @if (!Model.Any())
+                        {
+                            <tr>
+                                <td colspan="9" class="text-center">No orders found</td>
+                            </tr>
+                        }
+                        else
+                        {
+                            int i = 1;
+                            foreach (var item in Model)
+                            {
+                                <tr class="clickable-row"
+                                    data-href="/Admin/Order/Details/@item.OrderId">
+                                    <td>@(i++)</td>
+
+                                    <td><strong>#@item.OrderId</strong></td>
+
+                                    <td>
+                                        @item.CustomerName
+                                        <br />
+                                        <small class="text-muted">@item.CustomerEmail</small>
+                                    </td>
+
+                                    <td>&#8377;@item.TotalAmount.ToString("N2")</td>
+
+                                    <td>@item.PaymentMethod</td>
+
+                                    <td>
+                                        <!-- ✅ added order-status-badge class -->
+                                        <span class="badge order-status-badge
+                                                      bg-@GetOrderStatusColor(item.OrderStatus)">
+                                            @item.OrderStatus
+                                        </span>
+                                    </td>
+
+                                    <td>
+                                        <span class="badge
+                                                      bg-@GetPaymentStatusColor(item.PaymentStatus)">
+                                            @item.PaymentStatus
+                                        </span>
+                                    </td>
+
+                                    <td>@item.OrderDate.ToString("dd MMM yyyy")</td>
+
+                                    <td>
+                                        <!-- stop row click when clicking buttons -->
+                                        <a href="/Admin/Order/Details/@item.OrderId"
+                                           class="btn btn-sm btn-info text-white"
+                                           onclick="event.stopPropagation()">
+                                            <i class="bi bi-eye"></i> View
+                                        </a>
+
+                                        <form action="/Admin/Order/Delete"
+                                              method="post"
+                                              class="delete-form d-inline"
+                                              onclick="event.stopPropagation()">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="id" value="@item.OrderId" />
+                                            <button type="submit" class="btn btn-sm btn-danger">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+@functions {
+    string GetOrderStatusColor(string status) => status switch
+    {
+        "Pending" => "warning text-dark",
+        "Confirmed" => "primary",
+        "Shipped" => "info text-dark",
+        "Delivered" => "success",
+        "Cancelled" => "danger",
+        _ => "secondary"
+    };
+
+    string GetPaymentStatusColor(string status) => status switch
+    {
+        "Paid" => "success",
+        "Pending" => "warning text-dark",
+        "Failed" => "danger",
+        _ => "secondary"
+    };
+}
+
+@section Scripts {
+    <script src="~/js/admin/order.js"></script>
+}

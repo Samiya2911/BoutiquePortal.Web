@@ -48,5 +48,6 @@ namespace BoutiquePortal.Model.Models
         // 🔹 DISPLAY PURPOSE (JOIN DATA)
         public string? CategoryName { get; set; }
         public string? SubCategoryName { get; set; }
+        public string? VendorName { get; set; }
     }
 }

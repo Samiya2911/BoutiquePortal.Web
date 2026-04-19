@@ -1,0 +1,138 @@
+﻿@model IEnumerable<BoutiquePortal.Model.Models.Product>
+
+@{
+    Layout = "~/Areas/Vendor/Views/Shared/_VendorLayout.cshtml";
+    ViewBag.Title = "My Products";
+}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between mb-3">
+        <h2>My Products</h2>
+        <a href="/Vendor/Product/AddEdit" class="btn btn-success">
+            <i class="bi bi-plus"></i> Add Product
+        </a>
+    </div>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show">
+            @TempData["Success"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show">
+            @TempData["Error"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <div class="card shadow">
+        <div class="card-body table-responsive">
+
+            <table class="table table-bordered table-hover align-middle">
+                <thead class="table-dark">
+                    <tr>
+                        <th>#</th>
+                        <th>Image</th>
+                        <th>Product Name</th>
+                        <th>Category</th>
+                        <th>Sub Category</th>
+                        <th>Price</th>
+                        <th>Discount</th>
+                        <th>Qty</th>
+                        <th>Status</th>
+                        <th>Created</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @if (!Model.Any())
+                    {
+                        <tr>
+                            <td colspan="11" class="text-center">No products found</td>
+                        </tr>
+                    }
+                    else
+                    {
+                        int i = 1;
+                        foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>@(i++)</td>
+
+                                <td>
+                                    @if (!string.IsNullOrEmpty(item.ProductImage))
+                                    {
+                                        <img src="~/images/product/@item.ProductImage"
+                                             width="60" height="60"
+                                             style="object-fit:cover; border-radius:4px;"
+                                             onerror="this.style.display='none'" />
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">No Image</span>
+                                    }
+                                </td>
+
+                                <td>@item.ProductName</td>
+                                <td>@item.CategoryName</td>
+                                <td>@(item.SubCategoryName ?? "-")</td>
+
+                                <td>&#8377;@item.Price.ToString("0.00")</td>
+
+                                <td>
+                                    @if (item.DiscountPrice.HasValue && item.DiscountPrice > 0)
+                                    {
+                                        <span class="text-success">
+                                            &#8377;@item.DiscountPrice.Value.ToString("0.00")
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">-</span>
+                                    }
+                                </td>
+
+                                <td>@item.Quantity</td>
+
+                                <td>
+                                    <span class="badge bg-@(item.IsActive ? "success" : "danger")">
+                                        @(item.IsActive ? "Active" : "Inactive")
+                                    </span>
+                                </td>
+
+                                <td>@item.CreatedDate.ToString("dd MMM yyyy")</td>
+
+                                <td>
+                                    <a href="/Vendor/Product/AddEdit/@item.ProductId"
+                                       class="btn btn-sm btn-primary">
+                                        Edit
+                                    </a>
+
+                                    <form action="/Vendor/Product/Delete"
+                                          method="post"
+                                          class="delete-form d-inline">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="id" value="@item.ProductId" />
+                                        <button type="submit" class="btn btn-sm btn-danger">
+                                            Delete
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/vendor/product.js"></script>
+}

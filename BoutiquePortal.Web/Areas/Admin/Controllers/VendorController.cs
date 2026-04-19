@@ -1,10 +1,13 @@
-﻿using BoutiquePortal.Model.Models;
+﻿//using BoutiquePortal.Model.Models;
+using VendorModel = BoutiquePortal.Model.Models.Vendor;
 using BoutiquePortal.Services.Interfaces;
+using BoutiquePortal.Web.Filters;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BoutiquePortal.Web.Areas.Admin.Controllers
 {
     [Area("Admin")]
+    [AdminAuthFilter]
     public class VendorController : Controller
     {
         private readonly IVendorService _service;
@@ -40,16 +43,16 @@ namespace BoutiquePortal.Web.Areas.Admin.Controllers
             if (id.HasValue && id.Value > 0)
             {
                 var existing = await _service.GetByIdAsync(id.Value);
-                return View(existing ?? new Vendor());
+                return View(existing ?? new VendorModel());
             }
 
-            return View(new Vendor { IsActive = true });
+            return View(new VendorModel { IsActive = true });
         }
 
         // ================== AddEdit POST ==================
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> AddEdit(Vendor model)
+        public async Task<IActionResult> AddEdit(VendorModel model)
         {
             // ================== MANUAL BINDING ==================
             model.VendorName = Request.Form["VendorName"].ToString().Trim();

@@ -1,3 +1,4 @@
+using BoutiquePortal.Model.Models;
 using BoutiquePortal.Repositories.Interfaces;
 using BoutiquePortal.Repositories.Repository;
 using BoutiquePortal.Services.Interfaces;
@@ -18,36 +19,53 @@ builder.Services.AddSession(options =>
 });
 
 
-//// Dependency Injection (Repositories)
+//// Dependency Injection (Repositories)  (Services)
+
+// Auth
+builder.Services.AddScoped<IAuthRepository, AuthRepository>();
+builder.Services.AddScoped<IAuthService, AuthService>();
+
+// Vendor
 builder.Services.AddScoped<IVendorRepository, VendorRepository>();
-
-builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
-builder.Services.AddScoped<ISubCategoryRepository, SubCategoryRepository>();
-builder.Services.AddScoped<IProductRepository, ProductRepository>();  //System.IO.InvalidDataException: 'Failed to load configuration from file 'D:\MCA Project\4 10 26 new start\BoutiquePortal.Web\BoutiquePortal.Web\appsettings.json'.'
-
-//builder.Services.AddScoped<IAuthRepository, AuthRepository>();
-//// builder.Services.AddScoped<ICartRepository, CartRepository>();
-
-builder.Services.AddScoped<ICountryRepository, CountryRepository>();
-builder.Services.AddScoped<IStateRepository, StateRepository>();
-builder.Services.AddScoped<ICityRepository, CityRepository>();
-
-
-//// Dependency Injection (Services)
 builder.Services.AddScoped<IVendorService, VendorService>();
 
-builder.Services.AddScoped<ICategoryService, CategoryService>();
-builder.Services.AddScoped<ISubCategoryService, SubCategoryService>();
+// Product
+builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<IProductService, ProductService>();
 
-//builder.Services.AddScoped<IAuthService, AuthService>();
-//// builder.Services.AddScoped<ICartService, CartService>();
+// Product By Vendor
+builder.Services.AddScoped<IProductVendorRepository, ProductVendorRepository>();
+builder.Services.AddScoped<IProductVendorService, ProductVendorService>();
 
+//Category
+builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
+builder.Services.AddScoped<ICategoryService, CategoryService>();
+
+//SubCategory
+builder.Services.AddScoped<ISubCategoryRepository, SubCategoryRepository>();
+builder.Services.AddScoped<ISubCategoryService, SubCategoryService>();
+
+// Country, 
+builder.Services.AddScoped<ICountryRepository, CountryRepository>();
 builder.Services.AddScoped<ICountryService, CountryService>();
+
+// State
+builder.Services.AddScoped<IStateRepository, StateRepository>();
 builder.Services.AddScoped<IStateService, StateService>();
+
+// City
+builder.Services.AddScoped<ICityRepository, CityRepository>();
 builder.Services.AddScoped<ICityService, CityService>();
 
+// Cart
+//// builder.Services.AddScoped<ICartRepository, CartRepository>();
+//// builder.Services.AddScoped<ICartService, CartService>();
 
+// Order
+builder.Services.AddScoped<IOrderRepository, OrderRepository>();
+builder.Services.AddScoped<IOrderService, OrderService>();
+
+//System.IO.InvalidDataException: 'Failed to load configuration from file 'D:\MCA Project\4 10 26 new start\BoutiquePortal.Web\BoutiquePortal.Web\appsettings.json'.'
 
 var app = builder.Build();
 

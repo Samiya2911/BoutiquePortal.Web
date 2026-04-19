@@ -1,0 +1,212 @@
+﻿@model BoutiquePortal.Model.ViewModels.VendorEarningsVM
+@{
+    Layout = "~/Areas/Vendor/Views/Shared/_VendorLayout.cshtml";
+    ViewBag.Title = "My Earnings";
+}
+
+<div class="pagetitle">
+    <h1>My Earnings</h1>
+    <nav>
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="/Vendor/Dashboard">Dashboard</a></li>
+            <li class="breadcrumb-item active">Earnings</li>
+        </ol>
+    </nav>
+</div>
+
+<section class="section dashboard">
+    <div class="row">
+
+        <!-- ================== TOTAL EARNINGS ================== -->
+        <div class="col-md-3 col-sm-6">
+            <div class="card info-card revenue-card">
+                <div class="card-body">
+                    <h5 class="card-title">Total Earnings</h5>
+                    <div class="d-flex align-items-center">
+                        <div class="card-icon rounded-circle d-flex
+                                    align-items-center justify-content-center">
+                            <i class="bi bi-currency-rupee"></i>
+                        </div>
+                        <div class="ps-3">
+                            <!-- ✅ counter-value with data-target -->
+                            <h6>
+                                <span class="counter-value"
+                                      data-target="@Model.TotalEarnings"
+                                      data-rupee="true">
+                                    &#8377;@Model.TotalEarnings.ToString("N2")
+                                </span>
+                            </h6>
+                            <span class="text-success small fw-bold">All Time</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================== THIS MONTH ================== -->
+        <div class="col-md-3 col-sm-6">
+            <div class="card info-card sales-card">
+                <div class="card-body">
+                    <h5 class="card-title">This Month</h5>
+                    <div class="d-flex align-items-center">
+                        <div class="card-icon rounded-circle d-flex
+                                    align-items-center justify-content-center">
+                            <i class="bi bi-calendar-check"></i>
+                        </div>
+                        <div class="ps-3">
+                            <!-- ✅ counter-value with data-target -->
+                            <h6>
+                                <span class="counter-value"
+                                      data-target="@Model.ThisMonthEarnings"
+                                      data-rupee="true">
+                                    &#8377;@Model.ThisMonthEarnings.ToString("N2")
+                                </span>
+                            </h6>
+                            <span class="text-primary small fw-bold">Current Month</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================== PENDING AMOUNT ================== -->
+        <div class="col-md-3 col-sm-6">
+            <div class="card info-card">
+                <div class="card-body">
+                    <h5 class="card-title">Pending Amount</h5>
+                    <div class="d-flex align-items-center">
+                        <div class="card-icon rounded-circle d-flex
+                                    align-items-center justify-content-center">
+                            <i class="bi bi-hourglass-split"></i>
+                        </div>
+                        <div class="ps-3">
+                            <!-- ✅ counter-value with data-target -->
+                            <h6>
+                                <span class="counter-value"
+                                      data-target="@Model.PendingAmount"
+                                      data-rupee="true">
+                                    &#8377;@Model.PendingAmount.ToString("N2")
+                                </span>
+                            </h6>
+                            <span class="text-warning small fw-bold">
+                                @Model.PendingOrders Pending Orders
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================== TOTAL ORDERS ================== -->
+        <div class="col-md-3 col-sm-6">
+            <div class="card info-card customers-card">
+                <div class="card-body">
+                    <h5 class="card-title">Total Orders</h5>
+                    <div class="d-flex align-items-center">
+                        <div class="card-icon rounded-circle d-flex
+                                    align-items-center justify-content-center">
+                            <i class="bi bi-cart-check"></i>
+                        </div>
+                        <div class="ps-3">
+                            <!-- ✅ counter-value with data-target -->
+                            <h6>
+                                <span class="counter-value"
+                                      data-target="@Model.TotalOrders"
+                                      data-rupee="false">
+                                    @Model.TotalOrders
+                                </span>
+                            </h6>
+                            <span class="text-muted small">All Time Orders</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- ================== SUMMARY TABLE ================== -->
+    <div class="row mt-2">
+        <div class="col-12">
+            <div class="card shadow">
+                <div class="card-body">
+                    <h5 class="card-title">Earnings Summary</h5>
+
+                    <div class="table-responsive">
+                        <table class="table table-bordered align-middle">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>Description</th>
+                                    <th>Amount</th>
+                                    <th>Orders</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        <i class="bi bi-graph-up text-success me-2"></i>
+                                        Total Earnings (All Time)
+                                    </td>
+                                    <td>
+                                        <strong class="text-success">
+                                            &#8377;@Model.TotalEarnings.ToString("N2")
+                                        </strong>
+                                    </td>
+                                    <td>@Model.TotalOrders orders</td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <i class="bi bi-calendar2-check text-primary me-2"></i>
+                                        This Month Earnings
+                                    </td>
+                                    <td>
+                                        <strong class="text-primary">
+                                            &#8377;@Model.ThisMonthEarnings.ToString("N2")
+                                        </strong>
+                                    </td>
+                                    <td>—</td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <i class="bi bi-hourglass text-warning me-2"></i>
+                                        Pending (Not Yet Delivered)
+                                    </td>
+                                    <td>
+                                        <strong class="text-warning">
+                                            &#8377;@Model.PendingAmount.ToString("N2")
+                                        </strong>
+                                    </td>
+                                    <td>@Model.PendingOrders orders</td>
+                                </tr>
+                                <tr class="table-success">
+                                    <td>
+                                        <i class="bi bi-check-circle text-success me-2"></i>
+                                        Received (Delivered Orders)
+                                    </td>
+                                    <td>
+                                        <strong class="text-success">
+                                            &#8377;@((Model.TotalEarnings - Model.PendingAmount).ToString("N2"))
+                                        </strong>
+                                    </td>
+                                    <td>
+                                        @(Model.TotalOrders - Model.PendingOrders) orders
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <a href="/Vendor/Order" class="btn btn-primary mt-3">
+                        <i class="bi bi-cart"></i> View All Orders
+                    </a>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+</section>
+
+@section Scripts {
+    <script src="~/js/vendor/earnings.js"></script>
+}
