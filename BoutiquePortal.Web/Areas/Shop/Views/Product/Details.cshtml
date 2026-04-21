@@ -1,0 +1,191 @@
+﻿@model BoutiquePortal.Model.Models.Product
+@{
+    Layout = "~/Areas/Shop/Views/Shared/_ShopLayout.cshtml";
+    ViewBag.Title = Model.ProductName;
+}
+
+<div class="product">
+    <div class="container" style="padding: 30px 0;">
+
+        <div class="row">
+
+            <!-- ======= LEFT: Product Image ======= -->
+            <div class="col-md-5">
+                @if (!string.IsNullOrEmpty(Model.ProductImage))
+                {
+                    <img src="~/images/product/@Model.ProductImage"
+                         class="img-responsive"
+                         style="width:100%; border-radius:8px;
+                                    box-shadow: 0 4px 15px rgba(0,0,0,0.1);"
+                         onerror="this.src='/shop/images/product1.jpg'"
+                         alt="@Model.ProductName" />
+                }
+                else
+                {
+                    <img src="~/shop/images/product1.jpg"
+                         class="img-responsive"
+                         style="width:100%; border-radius:8px;" />
+                }
+            </div>
+
+            <!-- ======= RIGHT: Product Info ======= -->
+            <div class="col-md-7" style="padding-left:30px;">
+
+                <h2 style="margin-bottom:5px;">@Model.ProductName</h2>
+                <p style="color:#888; margin-bottom:10px;">
+                    Brand: <strong>@Model.BrandName</strong> |
+                    Category: <strong>@Model.CategoryName</strong>
+                </p>
+
+                <!-- Price -->
+                <div style="margin: 15px 0;">
+                    @if (Model.DiscountPrice.HasValue && Model.DiscountPrice > 0)
+                    {
+                        <span style="font-size:16px; text-decoration:line-through; color:#999;">
+                            &#8377;@Model.Price.ToString("0.00")
+                        </span>
+                        <span style="font-size:26px; font-weight:bold; color:#e74c3c; margin-left:10px;">
+                            &#8377;@Model.DiscountPrice.Value.ToString("0.00")
+                        </span>
+                        <span style="background:#e74c3c; color:white; padding:3px 8px;
+                                         border-radius:4px; font-size:12px; margin-left:8px;">
+                            SALE
+                        </span>
+                    }
+                    else
+                    {
+                        <span style="font-size:26px; font-weight:bold; color:#333;">
+                            &#8377;@Model.Price.ToString("0.00")
+                        </span>
+                    }
+                </div>
+
+                <!-- Stock -->
+                <p style="margin-bottom:15px;">
+                    @if (Model.Quantity > 0)
+                    {
+                        <span style="color:green;">
+                            ✅ In Stock (@Model.Quantity available)
+                        </span>
+                    }
+                    else
+                    {
+                        <span style="color:red;">❌ Out of Stock</span>
+                    }
+                </p>
+
+                <!-- Description -->
+                @if (!string.IsNullOrEmpty(Model.Description))
+                {
+                    <div style="margin: 15px 0; line-height:1.7; color:#555;">
+                        <h5>Description</h5>
+                        <p>@Model.Description</p>
+                    </div>
+                }
+
+                <!-- Vendor -->
+                <p style="color:#888; font-size:13px;">
+                    Sold by: <strong>@Model.VendorName</strong>
+                </p>
+
+                <hr />
+
+                <!-- Buy Button -->
+                <!-- Replace the buy button section with this -->
+                @if (Model.Quantity > 0)
+                {
+                    @if (Context.Session.GetString("Role") == "Customer")
+                    {
+                        <!-- Quantity selector -->
+                        <div style="display:flex; align-items:center; gap:10px; margin-bottom:15px;">
+                            <label style="font-weight:600;">Qty:</label>
+                            <button onclick="changeQty(-1)"
+                                    style="width:32px; height:32px; border:1px solid #ddd;
+                                   background:#f5f5f5; cursor:pointer; border-radius:4px;
+                                   font-size:16px;">
+                                −
+                            </button>
+                            <span id="qty-display"
+                                  style="font-size:18px; font-weight:bold; min-width:30px;
+                                 text-align:center;">1</span>
+                            <button onclick="changeQty(1)"
+                                    style="width:32px; height:32px; border:1px solid #ddd;
+                                   background:#f5f5f5; cursor:pointer; border-radius:4px;
+                                   font-size:16px;">
+                                +
+                            </button>
+                        </div>
+
+                        <a id="add-to-cart-btn"
+                           href="/Shop/Cart/Add/@Model.ProductId?qty=1"
+                           class="btn btn-primary btn-lg"
+                           style="margin-right:10px;">
+                            🛒 Add to Cart
+                        </a>
+                    }
+                    else
+                    {
+                        <a href="/Customer/CustomerAccount/Login"
+                           class="btn btn-primary btn-lg"
+                           style="margin-right:10px;">
+                            Login to Buy
+                        </a>
+                    }
+                }
+
+                <a href="/Shop/Shop" class="btn btn-outline-secondary btn-lg">
+                    ← Back to Shop
+                </a>
+
+                @section Scripts {
+                    <script>
+                        var qty = 1;
+                        var maxQty = @Model.Quantity;
+
+                        function changeQty(delta) {
+                            qty = Math.max(1, Math.min(maxQty, qty + delta));
+                            document.getElementById('qty-display').textContent = qty;
+                            document.getElementById('add-to-cart-btn').href =
+                                '/Shop/Cart/Add/@Model.ProductId?qty=' + qty;
+                        }
+                    </script>
+                }
+
+
+              @*   @if (Model.Quantity > 0)
+                {
+                    @if (Context.Session.GetString("Role") == "Customer")
+                    {
+                        <a href="/Shop/Cart/Add/@Model.ProductId"
+                           class="btn btn-primary btn-lg"
+                           style="margin-right:10px;">
+                            🛒 Add to Cart
+                        </a>
+                    }
+                    else
+                    {
+                        <a href="/Customer/CustomerAccount/Login"
+                           class="btn btn-primary btn-lg"
+                           style="margin-right:10px;">
+                            Login to Buy
+                        </a>
+                    }
+                }
+                else
+                {
+                    <button class="btn btn-secondary btn-lg" disabled>
+                        Out of Stock
+                    </button>
+                }
+
+                <a href="/Shop/Shop"
+                   class="btn btn-outline-secondary btn-lg">
+                    ← Back to Shop
+                </a> *@
+
+            </div>
+
+        </div>
+
+    </div>
+</div>

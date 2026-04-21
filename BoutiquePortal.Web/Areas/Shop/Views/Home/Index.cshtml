@@ -1,0 +1,237 @@
+﻿@using BoutiquePortal.Model.Models
+@{
+    Layout = "~/Areas/Shop/Views/Shared/_ShopLayout.cshtml";
+    ViewBag.Title = "Home";
+    var newReleased = ViewBag.NewReleased as List<Product> ?? new List<Product>();
+    var featured = ViewBag.Featured as List<Product> ?? new List<Product>();
+}
+
+<!-- ======= BANNER SLIDER ======= -->
+<div class="banner">
+    <div class="container">
+        <script src="~/shop/js/responsiveslides.min.js"></script>
+        <script>
+            $(function () {
+                $("#slider").responsiveSlides({
+                    auto: true, nav: true, speed: 500,
+                    namespace: "callbacks", pager: true
+                });
+            });
+        </script>
+
+        <div id="top" class="callbacks_container">
+            <ul class="rslides" id="slider">
+                <li>
+                    <div class="banner-text">
+                        <h3>New Arrivals — Boutique Collection</h3>
+                        <p>
+                            Discover the latest fashion trends from top vendors.
+                            Shop now and enjoy exclusive deals.
+                        </p>
+                        <a href="/Shop/Shop">Shop Now</a>
+                    </div>
+                </li>
+                <li>
+                    <div class="banner-text">
+                        <h3>Exclusive Deals This Season</h3>
+                        <p>
+                            Get the best prices on premium products from
+                            verified vendors across the portal.
+                        </p>
+                        <a href="/Shop/Shop">Browse Products</a>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<!-- ======= NEW RELEASED ======= -->
+<div class="content">
+    <div class="container">
+        <div class="content-top">
+            <h1>NEW RELEASED</h1>
+
+            @* ✅ FIX: Split into rows of 3 BEFORE rendering *@
+            @{
+                // Split newReleased into rows of 3
+                var rows = new List<List<Product>>();
+                for (int r = 0; r < newReleased.Count; r += 3)
+                {
+                    rows.Add(newReleased.Skip(r).Take(3).ToList());
+                }
+            }
+
+            @foreach (var row in rows)
+            {
+                <div class="grid-in">
+                    @foreach (var item in row)
+                    {
+                        <div class="col-md-4 grid-top">
+                            <a href="/Shop/Product/Details/@item.ProductId"
+                               class="b-link-stripe b-animate-go thickbox">
+
+                                @if (!string.IsNullOrEmpty(item.ProductImage))
+                                {
+                                    <img class="img-responsive"
+                                         src="~/images/product/@item.ProductImage"
+                                         alt="@item.ProductName"
+                                         style="height:250px; object-fit:cover;" />
+                                }
+                                else
+                                {
+                                    <img class="img-responsive"
+                                         src="~/shop/images/pi.jpg"
+                                         alt="@item.ProductName"
+                                         style="height:250px; object-fit:cover;" />
+                                }
+
+                                <div class="b-wrapper">
+                                    <h3 class="b-animate b-from-left b-delay03">
+                                        <span>@item.CategoryName</span>
+                                    </h3>
+                                </div>
+                            </a>
+
+                            <p>
+                                <a href="/Shop/Product/Details/@item.ProductId">
+                                    @item.ProductName
+                                </a>
+                            </p>
+                        </div>
+                    }
+                    <div class="clearfix"></div>
+                </div>
+            }
+
+            @if (!newReleased.Any())
+            {
+                <div class="col-md-12 text-center" style="padding:40px 0;">
+                    <p style="color:#999;">No products available yet.</p>
+                    <a href="/Shop/Shop" class="btn btn-primary">
+                        Browse All Products
+                    </a>
+                </div>
+            }
+
+        </div>
+
+        <!-- ======= FEATURED COLLECTIONS ======= -->
+        <div class="content-top-bottom">
+            <h2>Featured Collections</h2>
+
+            @if (featured.Count >= 1)
+            {
+                <div class="col-md-6 men">
+                    <a href="/Shop/Product/Details/@featured[0].ProductId"
+                       class="b-link-stripe b-animate-go thickbox">
+
+                        @if (!string.IsNullOrEmpty(featured[0].ProductImage))
+                        {
+                            <img class="img-responsive"
+                                 src="~/images/product/@featured[0].ProductImage"
+                                 alt="@featured[0].ProductName"
+                                 style="height:350px; object-fit:cover;" />
+                        }
+                        else
+                        {
+                            <img class="img-responsive"
+                                 src="~/shop/images/t1.jpg"
+                                 alt="Featured Product"
+                                 style="height:350px; object-fit:cover;" />
+                        }
+
+                        <div class="b-wrapper">
+                            <h3 class="b-animate b-from-top top-in b-delay03">
+                                <span>@featured[0].ProductName</span>
+                            </h3>
+                        </div>
+                    </a>
+                </div>
+            }
+
+            @if (featured.Count >= 2)
+            {
+                <div class="col-md-6">
+
+                    <div class="col-md1">
+                        <a href="/Shop/Product/Details/@featured[1].ProductId"
+                           class="b-link-stripe b-animate-go thickbox">
+
+                            @if (!string.IsNullOrEmpty(featured[1].ProductImage))
+                            {
+                                <img class="img-responsive"
+                                     src="~/images/product/@featured[1].ProductImage"
+                                     alt="@featured[1].ProductName"
+                                     style="height:170px; object-fit:cover;" />
+                            }
+                            else
+                            {
+                                <img class="img-responsive"
+                                     src="~/shop/images/t2.jpg"
+                                     alt="Featured Product"
+                                     style="height:170px; object-fit:cover;" />
+                            }
+                        </a>
+                    </div>
+
+                    <div class="col-md2">
+                        @if (featured.Count >= 3)
+                        {
+                            <div class="col-md-6 men1">
+                                <a href="/Shop/Product/Details/@featured[2].ProductId"
+                                   class="b-link-stripe b-animate-go thickbox">
+
+                                    @if (!string.IsNullOrEmpty(featured[2].ProductImage))
+                                    {
+                                        <img class="img-responsive"
+                                             src="~/images/product/@featured[2].ProductImage"
+                                             alt="@featured[2].ProductName"
+                                             style="height:170px; object-fit:cover;" />
+                                    }
+                                    else
+                                    {
+                                        <img class="img-responsive"
+                                             src="~/shop/images/t3.jpg"
+                                             alt="Featured Product"
+                                             style="height:170px; object-fit:cover;" />
+                                    }
+                                </a>
+                            </div>
+                        }
+
+                        @if (featured.Count >= 4)
+                        {
+                            <div class="col-md-6 men2">
+                                <a href="/Shop/Product/Details/@featured[3].ProductId"
+                                   class="b-link-stripe b-animate-go thickbox">
+
+                                    @if (!string.IsNullOrEmpty(featured[3].ProductImage))
+                                    {
+                                        <img class="img-responsive"
+                                             src="~/images/product/@featured[3].ProductImage"
+                                             alt="@featured[3].ProductName"
+                                             style="height:170px; object-fit:cover;" />
+                                    }
+                                    else
+                                    {
+                                        <img class="img-responsive"
+                                             src="~/shop/images/t4.jpg"
+                                             alt="Featured Product"
+                                             style="height:170px; object-fit:cover;" />
+                                    }
+                                </a>
+                            </div>
+                        }
+
+                        <div class="clearfix"></div>
+                    </div>
+
+                </div>
+            }
+
+            <div class="clearfix"></div>
+        </div>
+
+    </div>
+</div>

@@ -1,0 +1,106 @@
+﻿@model IEnumerable<BoutiquePortal.Model.Models.Customer>
+@{
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+    ViewBag.Title = "Customers";
+}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between mb-3">
+        <h2>Customer List</h2>
+    </div>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show">
+            @TempData["Success"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <!-- Search -->
+    <div class="mb-3">
+        <input type="text"
+               id="customerSearch"
+               class="form-control"
+               placeholder="🔍 Search by name, email, phone..." />
+    </div>
+
+    <div class="card shadow">
+        <div class="card-body table-responsive">
+            <table class="table table-bordered table-hover align-middle">
+                <thead class="table-dark">
+                    <tr>
+                        <th>#</th>
+                        <th>Full Name</th>
+                        <th>Email</th>
+                        <th>Phone</th>
+                        <th>Status</th>
+                        <th>Registered</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (!Model.Any())
+                    {
+                        <tr>
+                            <td colspan="7" class="text-center">
+                                No customers found
+                            </td>
+                        </tr>
+                    }
+                    else
+                    {
+                        int i = 1;
+                        foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>@(i++)</td>
+                                <td>@item.FullName</td>
+                                <td>@item.Email</td>
+                                <td>@(item.Phone ?? "-")</td>
+                                <td>
+                                    <span class="badge bg-@(item.IsActive ? "success" : "danger")">
+                                        @(item.IsActive ? "Active" : "Inactive")
+                                    </span>
+                                </td>
+                                <td>@item.CreatedDate.ToString("dd MMM yyyy")</td>
+                                <td>
+                                    <!-- Toggle Status -->
+                                    <form action="/Admin/Customer/ToggleStatus"
+                                          method="post" class="d-inline">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="id"
+                                               value="@item.CustomerId" />
+                                        <input type="hidden" name="isActive"
+                                               value="@(!item.IsActive)" />
+                                        <button type="submit"
+                                                class="btn btn-sm btn-@(item.IsActive ? "warning" : "success")">
+                                            @(item.IsActive ? "Deactivate" : "Activate")
+                                        </button>
+                                    </form>
+
+                                    <!-- Delete -->
+                                    <form action="/Admin/Customer/Delete"
+                                          method="post"
+                                          class="delete-form d-inline">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="id"
+                                               value="@item.CustomerId" />
+                                        <button type="submit"
+                                                class="btn btn-sm btn-danger">
+                                            Delete
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/admin/customer.js"></script>
+}

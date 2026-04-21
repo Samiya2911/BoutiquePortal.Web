@@ -18,5 +18,9 @@ namespace BoutiquePortal.Repositories.Interfaces
 
         // OPTIONAL (for vendor later)
         Task<IEnumerable<Product>> GetByVendorId(int vendorId);
+
+        Task<IEnumerable<Product>> GetForShopAsync(int? categoryId, string? searchQuery);
+        Task<Product?> GetDetailAsync(int productId);
+
     }
 }

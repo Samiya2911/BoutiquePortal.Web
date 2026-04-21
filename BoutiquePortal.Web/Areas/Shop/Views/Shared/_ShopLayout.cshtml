@@ -1,0 +1,272 @@
+﻿@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Boutique Store — @ViewBag.Title</title>
+
+    <link href="~/shop/css/bootstrap.css" rel="stylesheet" type="text/css" media="all" />
+    <link href="~/shop/css/style.css" rel="stylesheet" type="text/css" media="all" />
+    <link href="~/shop/css/memenu.css" rel="stylesheet" type="text/css" media="all" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+
+    <link href='https://fonts.googleapis.com/css?family=Lato:100,300,400,700,900'
+          rel='stylesheet' type='text/css'>
+    <link href='https://fonts.googleapis.com/css?family=Roboto:400,100,300,500,700,900'
+          rel='stylesheet' type='text/css'>
+
+    <script src="~/shop/js/jquery.min.js"></script>
+    <script src="~/shop/js/memenu.js"></script>
+    <script>$(document).ready(function(){ $(".memenu").memenu(); });</script>
+    <script src="~/shop/js/simpleCart.min.js"></script>
+</head>
+<body>
+
+    <!-- ======= HEADER ======= -->
+    <div class="header">
+        <div class="header-top">
+            <div class="container">
+
+                <!-- Search -->
+                <div class="search">
+                    <form action="/Shop/Shop" method="get">
+                        <input type="text" name="q"
+                               value="@Context.Request.Query["q"]"
+                               placeholder="Search products..." />
+                        <input type="submit" value="Go" />
+                    </form>
+                </div>
+
+                <!-- Login / Cart -->
+                @* <div class="header-left">
+                    <ul>
+                        @if (Context.Session.GetString("Role") == "Customer")
+                        {
+                            <li>
+                                <a href="/Shop/Home/MyOrders">
+                                    My Orders
+                                </a>
+                            </li>
+                            <li>
+                                <a href="/Customer/CustomerAccount/Logout">
+                                    Logout (@Context.Session.GetString("CustomerName"))
+                                </a>
+                            </li>
+                        }
+                        else
+                        {
+                            <li><a href="/Customer/CustomerAccount/Login">Login</a></li>
+                            <li><a href="/Customer/CustomerAccount/Register">Register</a></li>
+                        }
+                    </ul>
+
+                    <!-- Cart -->
+                    
+                    <div class="cart box_1">
+                        <a href="/Shop/Cart">
+                            <h3>
+                                <div class="total">
+                                    <!-- ✅ Shows count from session -->
+                                    @{
+                                        var cartCount = BoutiquePortal.Web.Helpers.CartHelper
+                                        .GetCartCount(Context.Session);
+                                        var cartTotal = BoutiquePortal.Web.Helpers.CartHelper
+                                        .GetCartTotal(Context.Session);
+                                    }
+                                    @if (cartCount > 0)
+                                    {
+                                        <span>&#8377;@cartTotal.ToString("N2")</span>
+                                        <span>(@cartCount item@(cartCount != 1 ? "s" : ""))</span>
+                                    }
+                                    else
+                                    {
+                                        <span>Cart (0 items)</span>
+                                    }
+                                </div>
+                                <img src="~/shop/images/cart.png" alt="" />
+                            </h3>
+                        </a>
+                        @if (cartCount > 0)
+                        {
+                            <p><a href="/Shop/Cart/Clear">Empty Cart</a></p>
+                        }
+                    </div>
+                    <div class="clearfix"></div>
+                </div> *@
+
+
+                <!-- ✅ In _ShopLayout.cshtml header-left section -->
+                <div class="header-left">
+                    <ul>
+                        @if (Context.Session.GetString("Role") == "Customer")
+                        {
+                            <li>
+                                <a href="/Shop/Checkout/MyOrders">My Orders</a>
+                            </li>
+                            <li>
+                                <a href="/Customer/Account/Logout">
+                                    Logout (@Context.Session.GetString("CustomerName"))
+                                </a>
+                            </li>
+                        }
+                        else
+                        {
+                            <!-- ✅ Points to 3-link selection page -->
+                            <li>
+                                <a href="/Home/Index">Login</a>
+                            </li>
+                            <li>
+                                <a href="/Customer/Account/Register">Register</a>
+                            </li>
+                        }
+                    </ul>
+
+                    <!-- Cart -->
+                    <div class="cart box_1">
+                        <a href="/Shop/Cart">
+                            <h3>
+                                <div class="total">
+                                    @{
+                                        var cartCount = BoutiquePortal.Web.Helpers.CartHelper
+                                        .GetCartCount(Context.Session);
+                                        var cartTotal = BoutiquePortal.Web.Helpers.CartHelper
+                                        .GetCartTotal(Context.Session);
+                                    }
+                                    @if (cartCount > 0)
+                                    {
+                                        <span>&#8377;@cartTotal.ToString("N2")</span>
+                                        <span>
+                                            (@cartCount item@(cartCount != 1 ? "s" : ""))
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span>Cart (0 items)</span>
+                                    }
+                                </div>
+                                <img src="~/shop/images/cart.png" alt="" />
+                            </h3>
+                        </a>
+                        @if (cartCount > 0)
+                        {
+                            <p><a href="/Shop/Cart/Clear">Empty Cart</a></p>
+                        }
+                    </div>
+                    <div class="clearfix"></div>
+                </div>
+
+
+                <div class="clearfix"></div>
+            </div>
+        </div>
+
+        <!-- Logo + Nav -->
+        <div class="container">
+            <div class="head-top">
+                <div class="logo">
+                    <a href="/Shop/Home">
+                        <img src="~/shop/images/logo.png" alt="Boutique" />
+                    </a>
+                </div>
+
+                <div class="h_menu4">
+                    <ul class="memenu skyblue">
+                        <li class="active grid">
+                            <a class="color8" href="/Shop/Home">Home</a>
+                        </li>
+
+                        <!-- Shop with categories from DB -->
+                        <li>
+                            <a class="color1" href="/Shop/Shop">Shop</a>
+                            @if (ViewBag.Categories != null)
+                            {
+                                <div class="mepanel">
+                                    <div class="row">
+                                        <div class="col1">
+                                            <div class="h_nav">
+                                                <ul>
+                                                    @foreach (var cat in ViewBag.Categories)
+                                                    {
+                                                        <li>
+                                                            <a href="/Shop/Shop?categoryId=@cat.CategoryId">
+                                                                @cat.CategoryName
+                                                            </a>
+                                                        </li>
+                                                    }
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </li>
+
+                        <li>
+                            <a class="color6" href="/Shop/Home/Contact">Contact</a>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ======= PAGE CONTENT ======= -->
+    @RenderBody()
+
+    <!-- ======= FOOTER ======= -->
+    <div class="footer">
+        <div class="container">
+            <div class="footer-top-at">
+
+                <div class="col-md-4 amet-sed">
+                    <h4>MORE INFO</h4>
+                    <ul class="nav-bottom">
+                        <li><a href="#">How to order</a></li>
+                        <li><a href="#">FAQ</a></li>
+                        <li><a href="#">Shipping</a></li>
+                    </ul>
+                </div>
+
+                <div class="col-md-4 amet-sed">
+                    <h4>MY ACCOUNT</h4>
+                    <ul class="nav-bottom">
+                        @if (Context.Session.GetString("Role") == "Customer")
+                        {
+                            <li><a href="/Shop/Home/MyOrders">My Orders</a></li>
+                            <li><a href="/Customer/Profile">My Profile</a></li>
+                            <li><a href="/Customer/CustomerAccount/Logout">Logout</a></li>
+                        }
+                        else
+                        {
+                            <li><a href="/Customer/CustomerAccount/Login">Login</a></li>
+                            <li><a href="/Customer/CustomerAccount/Register">Register</a></li>
+                        }
+                    </ul>
+                </div>
+
+                <div class="col-md-4 amet-sed">
+                    <h4>Newsletter</h4>
+                    <p>Sign Up to get all news update and promo</p>
+                    <form>
+                        <input type="text" placeholder="Your email..." />
+                        <input type="submit" value="Sign up" />
+                    </form>
+                </div>
+
+                <div class="clearfix"></div>
+            </div>
+        </div>
+
+        <div class="footer-class">
+            <p>© 2026 <strong>Boutique Portal</strong> All Rights Reserved</p>
+        </div>
+    </div>
+
+    @RenderSection("Scripts", required: false)
+</body>
+</html>

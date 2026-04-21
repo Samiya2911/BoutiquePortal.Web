@@ -18,5 +18,6 @@ namespace BoutiquePortal.Services.Interfaces
         Task<int> UpdateStatusAsync(int orderId, string orderStatus, string paymentStatus);
         Task<int> DeleteAsync(int orderId);
         Task<VendorEarningsVM> GetEarningsAsync(int vendorId);
+        Task<IEnumerable<Order>> GetByCustomerAsync(int customerId);
     }
 }

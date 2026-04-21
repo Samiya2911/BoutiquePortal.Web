@@ -1,0 +1,125 @@
+﻿@model IEnumerable<BoutiquePortal.Model.Models.Order>
+@{
+    Layout = "~/Areas/Shop/Views/Shared/_ShopLayout.cshtml";
+    ViewBag.Title = "My Orders";
+}
+
+<div class="container" style="padding:30px 0;">
+
+    <h1 style="margin-bottom:25px;">📋 My Orders</h1>
+
+    @if (!Model.Any())
+    {
+        <div style="text-align:center; padding:60px 0;">
+            <div style="font-size:4rem; margin-bottom:15px;">🛍️</div>
+            <h3 style="color:#999;">No orders yet!</h3>
+            <p style="color:#bbb;">Start shopping to see your orders here.</p>
+            <a href="/Shop/Shop"
+               class="btn btn-primary btn-lg mt-3">
+                Browse Products
+            </a>
+        </div>
+    }
+    else
+    {
+        foreach (var order in Model)
+        {
+            <div class="cart-header" style="margin-bottom:15px; padding:20px;">
+
+                <div style="display:flex; justify-content:space-between;
+                                    align-items:center; flex-wrap:wrap; gap:10px;">
+
+                    <!-- Order ID + Date -->
+                    <div>
+                        <h4 style="margin:0; color:#333;">
+                            Order #@order.OrderId
+                        </h4>
+                        <small style="color:#888;">
+                            Placed on @order.OrderDate.ToString("dd MMM yyyy, hh:mm tt")
+                        </small>
+                    </div>
+
+                    <!-- Order Status Badge -->
+                    <div>
+                        @{
+                            var statusColor = order.OrderStatus switch
+                            {
+                                "Pending" => "#ffc107",
+                                "Confirmed" => "#007bff",
+                                "Shipped" => "#17a2b8",
+                                "Delivered" => "#28a745",
+                                "Cancelled" => "#dc3545",
+                                _ => "#6c757d"
+                            };
+                        }
+                <span style="background:@statusColor; color:white;
+                                     padding:5px 14px; border-radius:20px;
+                                     font-size:13px; font-weight:600;">
+                    @order.OrderStatus
+                </span>
+            </div>
+
+        </div>
+
+        <hr style="margin:15px 0;" />
+
+        <!-- Order Info Row -->
+        <div style="display:flex; gap:30px; flex-wrap:wrap;">
+
+            <div>
+                <small style="color:#888; display:block;">
+                    Payment Method
+                </small>
+                <strong>
+                    @(order.PaymentMethod == "COD"
+                                        ? "🚚 Cash on Delivery"
+                                        : order.PaymentMethod == "UPI"
+                                        ? "📱 UPI"
+                                        : "💳 Card")
+                </strong>
+            </div>
+
+                    <div>
+                        <small style="color:#888; display:block;">
+                            Payment Status
+                        </small>
+                @{
+                            var payColor = order.PaymentStatus == "Paid"
+                            ? "#28a745" : "#ffc107";
+                        }
+                        <strong style="color:@payColor;">
+                            @order.PaymentStatus
+                        </strong>
+                    </div>
+
+                    <div>
+                        <small style="color:#888; display:block;">
+                            Shipping To
+                        </small>
+                        <strong>
+                            @order.ShippingCity, @order.ShippingState
+                        </strong>
+                    </div>
+
+                    <div style="margin-left:auto;">
+                        <small style="color:#888; display:block;">
+                            Total Amount
+                        </small>
+                        <strong style="font-size:18px; color:#333;">
+                            &#8377;@order.TotalAmount.ToString("N2")
+                        </strong>
+                    </div>
+
+                </div>
+
+            </div>
+        }
+    }
+
+    <div style="text-align:center; margin-top:20px;">
+        <a href="/Shop/Shop" class="btn btn-outline-primary">
+            ← Continue Shopping
+        </a>
+    </div>
+
+</div>

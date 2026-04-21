@@ -1,0 +1,43 @@
+﻿@{
+    Layout = "~/Areas/Customer/Views/Shared/_CustomerLayout.cshtml";
+    ViewBag.Title = "My Dashboard";
+}
+
+<div class="pagetitle">
+    <h1>Welcome, @Context.Session.GetString("CustomerName") 👋</h1>
+    <nav>
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item active">Dashboard</li>
+        </ol>
+    </nav>
+</div>
+
+<section class="section dashboard">
+    <div class="row">
+
+        <div class="col-md-4">
+            <div class="card info-card">
+                <div class="card-body">
+                    <h5 class="card-title">My Profile</h5>
+                    <div class="d-flex align-items-center">
+                        <div class="card-icon rounded-circle d-flex
+                                    align-items-center justify-content-center">
+                            <i class="bi bi-person"></i>
+                        </div>
+                        <div class="ps-3">
+                            <h6>@Context.Session.GetString("CustomerName")</h6>
+                            <small class="text-muted">
+                                @Context.Session.GetString("CustomerEmail")
+                            </small>
+                        </div>
+                    </div>
+                    <a href="/Customer/Profile"
+                       class="btn btn-sm btn-outline-primary mt-3">
+                        Edit Profile
+                    </a>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</section>

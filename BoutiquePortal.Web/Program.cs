@@ -65,6 +65,10 @@ builder.Services.AddScoped<ICityService, CityService>();
 builder.Services.AddScoped<IOrderRepository, OrderRepository>();
 builder.Services.AddScoped<IOrderService, OrderService>();
 
+// Customer
+builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
+builder.Services.AddScoped<ICustomerService, CustomerService>();
+
 //System.IO.InvalidDataException: 'Failed to load configuration from file 'D:\MCA Project\4 10 26 new start\BoutiquePortal.Web\BoutiquePortal.Web\appsettings.json'.'
 
 var app = builder.Build();
@@ -89,9 +93,19 @@ app.UseAuthorization();
 
 
 // AREA Routing (Admin / Vendor)
+//app.MapControllerRoute(
+//    name: "areas",
+//    pattern: "{area:exists}/{controller=Dashboard}/{action=Index}/{id?}");
+
+app.MapGet("/", context =>
+{
+    context.Response.Redirect("/Shop/Home");
+    return Task.CompletedTask;
+});
+
 app.MapControllerRoute(
     name: "areas",
-    pattern: "{area:exists}/{controller=Dashboard}/{action=Index}/{id?}");
+    pattern: "{area:exists}/{controller=Home}/{action=Index}/{id?}");
 
 // AREA Routing (User)
 app.MapControllerRoute(

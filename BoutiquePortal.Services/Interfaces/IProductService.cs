@@ -17,5 +17,10 @@ namespace BoutiquePortal.Services.Interfaces
 
         Task<IEnumerable<Product>> GetByCategoryId(int categoryId);
         Task<IEnumerable<Product>> GetByVendorId(int vendorId);
+
+        Task<IEnumerable<Product>> GetForShopAsync(int? categoryId, string? searchQuery);
+        Task<Product?> GetDetailAsync(int productId);
+
+
     }
 }

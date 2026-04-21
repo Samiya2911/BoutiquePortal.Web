@@ -35,5 +35,14 @@ namespace BoutiquePortal.Services.Services
         {
             return await _repo.GetByVendorId(vendorId);
         }
+
+        public Task<IEnumerable<Product>> GetForShopAsync(
+    int? categoryId, string? searchQuery)
+    => _repo.GetForShopAsync(categoryId, searchQuery);
+
+        public Task<Product?> GetDetailAsync(int productId)
+            => _repo.GetDetailAsync(productId);
+
+
     }
 }

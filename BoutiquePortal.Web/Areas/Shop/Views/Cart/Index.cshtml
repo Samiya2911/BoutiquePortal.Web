@@ -1,0 +1,343 @@
+﻿@model List<BoutiquePortal.Model.Models.CartItem>
+@{
+    Layout = "~/Areas/Shop/Views/Shared/_ShopLayout.cshtml";
+    ViewBag.Title = "My Shopping Cart";
+
+    decimal subTotal = Model.Sum(c => c.SubTotal);
+    decimal deliveryCharge = Model.Any() ? 100m : 0m;
+    decimal grandTotal = subTotal + deliveryCharge;
+}
+
+<div class="container">
+    <div class="check">
+
+        <h1>My Shopping Bag (@Model.Count item@(Model.Count != 1 ? "s" : ""))</h1>
+
+        @if (TempData["CartMsg"] != null)
+        {
+            <div class="alert alert-info alert-dismissible fade show">
+                @TempData["CartMsg"]
+                <button type="button" class="btn-close"
+                        data-bs-dismiss="alert"></button>
+            </div>
+        }
+
+        @if (!Model.Any())
+        {
+            <!-- ======= EMPTY CART ======= -->
+            <div style="text-align:center; padding:60px 0;">
+                <img src="~/shop/images/cart.png" alt="Empty Cart"
+                     style="width:80px; opacity:0.4; margin-bottom:20px;" />
+                <h3 style="color:#999;">Your cart is empty!</h3>
+                <p style="color:#bbb;">
+                    Browse our products and add items to your cart.
+                </p>
+                <a href="/Shop/Shop"
+                   class="btn btn-primary btn-lg mt-3">
+                    Continue Shopping
+                </a>
+            </div>
+        }
+        else
+        {
+            <!-- ======= LEFT: CART ITEMS ======= -->
+            <div class="col-md-9 cart-items">
+
+                @foreach (var item in Model)
+                {
+                    <div class="cart-header" id="cart-row-@item.ProductId">
+
+                        <!-- Remove Button -->
+                        <div class="close1 remove-item"
+                             data-product-id="@item.ProductId"
+                             style="cursor:pointer;" title="Remove">
+                        </div>
+
+                        <div class="cart-sec">
+
+                            <!-- Product Image -->
+                            <div class="cart-item cyc">
+                                @if (!string.IsNullOrEmpty(item.ProductImage))
+                                {
+                                    <img src="~/images/product/@item.ProductImage"
+                                         class="img-responsive"
+                                         style="width:80px; height:80px;
+                                                            object-fit:cover; border-radius:6px;"
+                                         onerror="this.src='/shop/images/pic1.jpg'"
+                                         alt="@item.ProductName" />
+                                }
+                                else
+                                {
+                                    <img src="~/shop/images/pic1.jpg"
+                                         class="img-responsive"
+                                         style="width:80px; height:80px;
+                                                            object-fit:cover; border-radius:6px;"
+                                         alt="@item.ProductName" />
+                                }
+                            </div>
+
+                            <!-- Product Info -->
+                            <div class="cart-item-info">
+                                <h3>
+                                    <a href="/Shop/Product/Details/@item.ProductId">
+                                        @item.ProductName
+                                    </a>
+                                    <span>Brand: @item.BrandName</span>
+                                </h3>
+
+                                <ul class="qty">
+                                    <li>
+                                        <p>
+                                            Price:
+                                            @if (item.DiscountPrice.HasValue
+                                                                                && item.DiscountPrice > 0)
+                                            {
+                                                <span style="text-decoration:line-through;
+                                                                         color:#999; font-size:12px;">
+                                                    &#8377;@item.Price.ToString("0.00")
+                                                </span>
+                                                <strong style="color:#e74c3c;">
+                                                    &#8377;@item.DiscountPrice.Value.ToString("0.00")
+                                                </strong>
+                                            }
+                                            else
+                                            {
+                                                <strong>&#8377;@item.Price.ToString("0.00")</strong>
+                                            }
+                                        </p>
+                                    </li>
+
+                                    <!-- Quantity Control -->
+                                    <li>
+                                        <p>
+                                            Qty:
+                                            <span style="display:inline-flex;
+                                                                 align-items:center; gap:8px;">
+                                                <button class="qty-btn btn-minus"
+                                                        data-product-id="@item.ProductId"
+                                                        style="width:28px; height:28px;
+                                                                       border:1px solid #ddd;
+                                                                       background:#f5f5f5;
+                                                                       cursor:pointer;
+                                                                       border-radius:4px;">
+                                                    −
+                                                </button>
+                                                <span class="qty-value"
+                                                      id="qty-@item.ProductId"
+                                                      style="font-weight:bold;
+                                                                     min-width:20px;
+                                                                     text-align:center;">
+                                                    @item.Quantity
+                                                </span>
+                                                <button class="qty-btn btn-plus"
+                                                        data-product-id="@item.ProductId"
+                                                        style="width:28px; height:28px;
+                                                                       border:1px solid #ddd;
+                                                                       background:#f5f5f5;
+                                                                       cursor:pointer;
+                                                                       border-radius:4px;">
+                                                    +
+                                                </button>
+                                            </span>
+                                        </p>
+                                    </li>
+                                </ul>
+
+                                <div class="delivery">
+                                    <p>
+                                        Sub Total:
+                                        <strong id="subtotal-@item.ProductId"
+                                                style="color:#333;">
+                                            &#8377;@item.SubTotal.ToString("N2")
+                                        </strong>
+                                    </p>
+                                    <span>Delivered in 2-3 business days</span>
+                                    <div class="clearfix"></div>
+                                </div>
+                            </div>
+
+                            <div class="clearfix"></div>
+                        </div>
+
+                    </div>
+                }
+
+                <!-- Continue Shopping -->
+                <div style="margin-top:20px;">
+                    <a href="/Shop/Shop" class="btn btn-outline-primary">
+                        ← Continue Shopping
+                    </a>
+                    <a href="/Shop/Cart/Clear"
+                       class="btn btn-outline-danger ms-2"
+                       onclick="return confirm('Clear all items from cart?')">
+                        Clear Cart
+                    </a>
+                </div>
+
+            </div>
+
+            <!-- ======= RIGHT: PRICE SUMMARY ======= -->
+            <div class="col-md-3 cart-total">
+
+                <a class="continue" href="/Shop/Shop">Continue Shopping</a>
+
+                <div class="price-details">
+                    <h3>Price Details</h3>
+
+                    <span>Sub Total</span>
+                    <span class="total1" id="cart-subtotal">
+                        &#8377;@subTotal.ToString("N2")
+                    </span>
+
+                    <span>Delivery Charges</span>
+                    <span class="total1">&#8377;@deliveryCharge.ToString("N2")</span>
+
+                    <div class="clearfix"></div>
+                </div>
+
+                <ul class="total_price">
+                    <li class="last_price"><h4>TOTAL</h4></li>
+                    <li class="last_price">
+                        <span id="cart-grandtotal">
+                            &#8377;@grandTotal.ToString("N2")
+                        </span>
+                    </li>
+                    <div class="clearfix"></div>
+                </ul>
+
+                <!-- Place Order Button -->
+                @if (Context.Session.GetString("Role") == "Customer")
+                {
+                    <a class="order" href="/Shop/Checkout">
+                        Proceed to Checkout
+                    </a>
+                }
+                else
+                {
+                    <a class="order"
+                       href="/Customer/CustomerAccount/Login">
+                        Login to Checkout
+                    </a>
+                }
+
+                <div class="total-item">
+                    <h3>ITEMS (@Model.Sum(c => c.Quantity))</h3>
+                    @foreach (var item in Model)
+                    {
+                        <p style="font-size:12px; margin-bottom:4px;">
+                            @item.ProductName × @item.Quantity =
+                            <strong>&#8377;@item.SubTotal.ToString("N2")</strong>
+                        </p>
+                    }
+                </div>
+
+            </div>
+
+            <div class="clearfix"></div>
+        }
+
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        var antiForgeryToken = '@Html.AntiForgeryToken()';
+
+        // ======= REMOVE ITEM =======
+        document.querySelectorAll('.remove-item').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                var productId = this.getAttribute('data-product-id');
+
+                if (!confirm('Remove this item from cart?')) return;
+
+                fetch('/Shop/Cart/Remove', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: 'productId=' + productId +
+                          '&__RequestVerificationToken=' +
+                          document.querySelector('input[name="__RequestVerificationToken"]')?.value
+                })
+                .then(r => r.json())
+                .then(data => {
+                    if (data.success) {
+                        // Remove row with animation
+                        var row = document.getElementById('cart-row-' + productId);
+                        if (row) {
+                            row.style.transition = 'opacity 0.3s';
+                            row.style.opacity    = '0';
+                            setTimeout(() => {
+                                row.remove();
+                                updateCartSummary(data.cartTotal, data.cartCount);
+
+                                // Show empty message if no items
+                                var rows = document.querySelectorAll('.cart-header');
+                                if (rows.length === 0) {
+                                    location.reload();
+                                }
+                            }, 300);
+                        }
+                    }
+                })
+                .catch(() => alert('Error removing item.'));
+            });
+        });
+
+        // ======= QTY BUTTONS =======
+        document.querySelectorAll('.qty-btn').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                var productId  = this.getAttribute('data-product-id');
+                var qtyEl      = document.getElementById('qty-' + productId);
+                var currentQty = parseInt(qtyEl.textContent.trim());
+                var newQty     = this.classList.contains('btn-plus')
+                                 ? currentQty + 1
+                                 : currentQty - 1;
+
+                if (newQty <= 0) {
+                    if (confirm('Remove this item from cart?')) {
+                        document.querySelector(
+                            '.remove-item[data-product-id="' + productId + '"]'
+                        ).click();
+                    }
+                    return;
+                }
+
+                fetch('/Shop/Cart/UpdateQty', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: 'productId=' + productId + '&quantity=' + newQty
+                })
+                .then(r => r.json())
+                .then(data => {
+                    if (data.success) {
+                        // Update qty display
+                        qtyEl.textContent = newQty;
+
+                        // Update subtotal for this item
+                        var subEl = document.getElementById('subtotal-' + productId);
+                        if (subEl) subEl.innerHTML = '&#8377;' + data.subTotal;
+
+                        // Update cart summary
+                        updateCartSummary(data.cartTotal, data.cartCount);
+                    }
+                })
+                .catch(() => alert('Error updating quantity.'));
+            });
+        });
+
+        // ======= UPDATE CART SUMMARY =======
+        function updateCartSummary(cartTotal, cartCount) {
+            var delivery   = @(Model.Any() ? "100" : "0");
+            var total      = parseFloat(cartTotal.replace(',', '')) + delivery;
+
+            var subEl   = document.getElementById('cart-subtotal');
+            var totalEl = document.getElementById('cart-grandtotal');
+
+            if (subEl)   subEl.innerHTML   = '&#8377;' + cartTotal;
+            if (totalEl) totalEl.innerHTML = '&#8377;' + total.toFixed(2);
+
+            // Update header cart count
+            var countEls = document.querySelectorAll('.simpleCart_quantity');
+            countEls.forEach(el => el.textContent = cartCount);
+        }
+    </script>
+}

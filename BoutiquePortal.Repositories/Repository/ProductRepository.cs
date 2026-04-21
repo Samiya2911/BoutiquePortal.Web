@@ -129,5 +129,27 @@ namespace BoutiquePortal.Repositories.Repository
                 commandType: CommandType.StoredProcedure
             );
         }
+
+
+        
+        public async Task<IEnumerable<Product>> GetForShopAsync(
+            int? categoryId, string? searchQuery)
+        {
+            using var conn = new SqlConnection(_connectionString);
+            return await conn.QueryAsync<Product>(
+                "sp_Product_GetForShop",
+                new { CategoryId = categoryId, SearchQuery = searchQuery },
+                commandType: CommandType.StoredProcedure);
+        }
+
+        public async Task<Product?> GetDetailAsync(int productId)
+        {
+            using var conn = new SqlConnection(_connectionString);
+            return await conn.QueryFirstOrDefaultAsync<Product>(
+                "sp_Product_GetDetail",
+                new { ProductId = productId },
+                commandType: CommandType.StoredProcedure);
+        }
+
     }
 }

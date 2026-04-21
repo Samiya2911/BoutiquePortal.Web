@@ -1,0 +1,139 @@
+﻿@model BoutiquePortal.Model.ViewModels.CustomerProfileVM
+@{
+    Layout = "~/Areas/Customer/Views/Shared/_CustomerLayout.cshtml";
+    ViewBag.Title = "My Profile";
+}
+
+<div class="pagetitle">
+    <h1>My Profile</h1>
+    <nav>
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+                <a href="/Customer/Dashboard">Dashboard</a>
+            </li>
+            <li class="breadcrumb-item active">Profile</li>
+        </ol>
+    </nav>
+</div>
+
+<section class="section">
+    <div class="row">
+
+        <!-- Profile Update -->
+        <div class="col-md-6">
+            <div class="card shadow">
+                <div class="card-body">
+                    <h5 class="card-title">👤 Edit Profile</h5>
+
+                    @if (TempData["Success"] != null)
+                    {
+                        <div class="alert alert-success small py-2">
+                            @TempData["Success"]
+                        </div>
+                    }
+
+                    @if (!ViewData.ModelState.IsValid)
+                    {
+                        <div class="alert alert-danger small py-2">
+                            @foreach (var error in ViewData.ModelState.Values
+                                                    .SelectMany(v => v.Errors))
+                            {
+                                <div>@error.ErrorMessage</div>
+                            }
+                        </div>
+                    }
+
+                    <form method="post" action="/Customer/Profile">
+                        @Html.AntiForgeryToken()
+
+                        <div class="mb-3">
+                            <label class="form-label">Full Name *</label>
+                            <input type="text"
+                                   name="FullName"
+                                   value="@Model.FullName"
+                                   class="form-control" />
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Email</label>
+                            <input type="email"
+                                   value="@Model.Email"
+                                   class="form-control"
+                                   readonly />
+                            <small class="text-muted">Email cannot be changed</small>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Phone *</label>
+                            <input type="text"
+                                   name="Phone"
+                                   value="@Model.Phone"
+                                   class="form-control" />
+                        </div>
+
+                        <button type="submit" class="btn btn-primary btn-sm">
+                            Update Profile
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Change Password -->
+        <div class="col-md-6">
+            <div class="card shadow">
+                <div class="card-body">
+                    <h5 class="card-title">🔒 Change Password</h5>
+
+                    @if (TempData["PasswordSuccess"] != null)
+                    {
+                        <div class="alert alert-success small py-2">
+                            @TempData["PasswordSuccess"]
+                        </div>
+                    }
+
+                    @if (TempData["PasswordError"] != null)
+                    {
+                        <div class="alert alert-danger small py-2">
+                            @TempData["PasswordError"]
+                        </div>
+                    }
+
+                    <form method="post"
+                          action="/Customer/Profile/ChangePassword">
+                        @Html.AntiForgeryToken()
+
+                        <div class="mb-3">
+                            <label class="form-label">Current Password</label>
+                            <input type="password"
+                                   name="CurrentPassword"
+                                   class="form-control"
+                                   placeholder="Enter current password" />
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">New Password</label>
+                            <input type="password"
+                                   name="NewPassword"
+                                   class="form-control"
+                                   placeholder="Min 6 characters" />
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Confirm New Password</label>
+                            <input type="password"
+                                   name="ConfirmNewPassword"
+                                   class="form-control"
+                                   placeholder="Re-enter new password" />
+                        </div>
+
+                        <button type="submit" class="btn btn-warning btn-sm">
+                            Change Password
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</section>

@@ -1,0 +1,171 @@
+﻿@model IEnumerable<BoutiquePortal.Model.Models.Product>
+@{
+    Layout = "~/Areas/Shop/Views/Shared/_ShopLayout.cshtml";
+    ViewBag.Title = "Shop";
+}
+
+<div class="product">
+    <div class="container">
+
+        <!-- ======= LEFT SIDEBAR ======= -->
+        <div class="col-md-3 product-price">
+            <div class="rsidebar span_1_of_left">
+                <div class="of-left">
+                    <h3 class="cate">Categories</h3>
+                </div>
+
+                <ul class="menu">
+                    <li class="@(ViewBag.SelectedCategory == null ? "item1" : "")">
+                        <a href="/Shop/Shop">All Products</a>
+                    </li>
+                    @if (ViewBag.Categories != null)
+                    {
+                        int idx = 1;
+                        foreach (var cat in ViewBag.Categories)
+                        {
+                            <li class="item@(idx++)">
+                                <a href="/Shop/Shop?categoryId=@cat.CategoryId"
+                                   class="@(ViewBag.SelectedCategory == cat.CategoryId ? "active" : "")">
+                                    @cat.CategoryName
+                                </a>
+                            </li>
+                        }
+                    }
+                </ul>
+
+                <!-- Accordion JS -->
+                <script type="text/javascript">
+                    $(function () {
+                        var menu_ul = $('.menu > li > ul'),
+                            menu_a  = $('.menu > li > a');
+                        menu_ul.hide();
+                        menu_a.click(function (e) {
+                            e.preventDefault();
+                            if (!$(this).hasClass('active')) {
+                                menu_a.removeClass('active');
+                                menu_ul.filter(':visible').slideUp('normal');
+                                $(this).addClass('active').next()
+                                       .stop(true, true).slideDown('normal');
+                            } else {
+                                $(this).removeClass('active');
+                                $(this).next().stop(true, true).slideUp('normal');
+                            }
+                        });
+                    });
+                </script>
+
+                <!-- Search Box -->
+                <div class="product-middle">
+                    <div class="fit-top">
+                        <h6 class="shop-top">Search Products</h6>
+                        <div class="clearfix"></div>
+                    </div>
+                </div>
+
+                <div class="sellers">
+                    <div class="of-left-in">
+                        <h3 class="tag">Filter</h3>
+                    </div>
+                    <div class="tags">
+                        <form action="/Shop/Shop" method="get">
+                            <input type="text" name="q"
+                                   value="@ViewBag.SearchQuery"
+                                   class="form-control"
+                                   placeholder="Search..." />
+                            @if (ViewBag.SelectedCategory != null)
+                            {
+                                <input type="hidden" name="categoryId"
+                                       value="@ViewBag.SelectedCategory" />
+                            }
+                            <button type="submit"
+                                    class="btn btn-sm btn-primary mt-2 w-100">
+                                Search
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- ======= RIGHT PRODUCT GRID ======= -->
+        <div class="col-md-9 product1">
+
+            @if (!Model.Any())
+            {
+                <div class="alert alert-info mt-3">
+                    No products found.
+                    <a href="/Shop/Shop">View all products</a>
+                </div>
+            }
+            else
+            {
+                int i = 0;
+                foreach (var item in Model)
+                {
+                    if (i % 3 == 0 && i > 0)
+                    {
+                        <div class="clearfix"></div>
+                    }
+                    i++;
+
+                    <div class="col-md-4 bottom-cd simpleCart_shelfItem">
+                        <div class="product-at">
+                            <a href="/Shop/Product/Details/@item.ProductId">
+                                @if (!string.IsNullOrEmpty(item.ProductImage))
+                                {
+                                    <img class="img-responsive"
+                                         src="~/images/product/@item.ProductImage"
+                                         alt="@item.ProductName"
+                                         style="height:220px; object-fit:cover;"
+                                         onerror="this.src='/shop/images/pi.jpg'" />
+                                }
+                                else
+                                {
+                                    <img class="img-responsive"
+                                         src="~/shop/images/pi.jpg"
+                                         alt="@item.ProductName"
+                                         style="height:220px; object-fit:cover;" />
+                                }
+                                <div class="pro-grid">
+                                    <span class="buy-in">View Details</span>
+                                </div>
+                            </a>
+                        </div>
+
+                        <p class="tun">@item.ProductName</p>
+                        <p style="font-size:12px; color:#888;">@item.BrandName</p>
+
+                        <p class="number item_price">
+                            @if (item.DiscountPrice.HasValue && item.DiscountPrice > 0)
+                            {
+                                <span style="text-decoration:line-through; color:#999; font-size:13px;">
+                                    &#8377;@item.Price.ToString("0.00")
+                                </span>
+                                <span style="color:#e74c3c; font-weight:bold;">
+                                    &#8377;@item.DiscountPrice.Value.ToString("0.00")
+                                </span>
+                            }
+                            else
+                            {
+                                <span style="color:#333; font-weight:bold;">
+                                    &#8377;@item.Price.ToString("0.00")
+                                </span>
+                            }
+                        </p>
+
+                        <a href="/Shop/Product/Details/@item.ProductId"
+                           class="btn btn-sm btn-primary mb-3">
+                            View Details
+                        </a>
+                    </div>
+                }
+                <div class="clearfix"></div>
+            }
+
+        </div>
+
+        <div class="clearfix"></div>
+
+    </div>
+</div>

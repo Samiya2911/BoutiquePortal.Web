@@ -39,5 +39,8 @@ namespace BoutiquePortal.Services.Services
 
         public Task<VendorEarningsVM> GetEarningsAsync(int vendorId)
             => _repo.GetEarningsAsync(vendorId);
+
+        public Task<IEnumerable<Order>> GetByCustomerAsync(int customerId)
+    => _repo.GetByCustomerAsync(customerId);
     }
 }

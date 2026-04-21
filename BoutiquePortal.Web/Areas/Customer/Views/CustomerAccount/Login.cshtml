@@ -1,0 +1,109 @@
+﻿@model BoutiquePortal.Model.ViewModels.CustomerLoginVM
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>Customer Login — Boutique</title>
+    <link href="~/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
+    <style>
+        body {
+            background: linear-gradient(135deg, #f093fb, #f5576c);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .card {
+            border-radius: 16px;
+            border: none;
+            box-shadow: 0 20px 50px rgba(0,0,0,.2);
+            max-width: 400px;
+            width: 100%;
+        }
+
+        .card-header {
+            background: linear-gradient(135deg, #f093fb, #f5576c);
+            color: white;
+            border-radius: 16px 16px 0 0 !important;
+            padding: 1.5rem;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+
+        <div class="card-header">
+            <h4 class="mb-0">🛍️ Customer Login</h4>
+            <small class="opacity-75">Welcome back!</small>
+        </div>
+
+        <div class="card-body p-4">
+
+            @if (TempData["SuccessMsg"] != null)
+            {
+                <div class="alert alert-success small py-2">
+                    @TempData["SuccessMsg"]
+                </div>
+            }
+
+            @if (!ViewData.ModelState.IsValid)
+            {
+                <div class="alert alert-danger py-2 small">
+                    @foreach (var error in ViewData.ModelState.Values
+                                    .SelectMany(v => v.Errors))
+                    {
+                        <div>@error.ErrorMessage</div>
+                    }
+                </div>
+            }
+
+            <form method="post" action="/Customer/CustomerAccount/Login">
+                @Html.AntiForgeryToken()
+
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Email Address</label>
+                    <input type="email"
+                           name="Email"
+                           value="@Model?.Email"
+                           class="form-control"
+                           placeholder="customer@email.com" />
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Password</label>
+                    <input type="password"
+                           name="Password"
+                           class="form-control"
+                           placeholder="••••••••" />
+                </div>
+
+                <div class="form-check mb-3">
+                    <input type="checkbox"
+                           name="RememberMe"
+                           value="true"
+                           class="form-check-input" />
+                    <label class="form-check-label small">Remember Me</label>
+                </div>
+
+                <button type="submit" class="btn btn-danger w-100">
+                    Login
+                </button>
+
+                <a href="/Customer/CustomerAccount/Register"
+                   class="btn btn-outline-danger w-100 mt-2">
+                    New Customer? Register Here
+                </a>
+
+                <a href="/" class="btn btn-link w-100 text-center small">
+                    ← Back to Portal
+                </a>
+            </form>
+        </div>
+    </div>
+</body>
+</html>
