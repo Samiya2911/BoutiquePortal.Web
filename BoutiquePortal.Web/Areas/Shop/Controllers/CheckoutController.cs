@@ -25,7 +25,7 @@ namespace BoutiquePortal.Web.Areas.Shop.Controllers
         {
             // Must be logged in
             if (HttpContext.Session.GetString("Role") != "Customer")
-                return RedirectToAction("Login", "Account",
+                return RedirectToAction("Login", "CustomerAccount",
                     new { area = "Customer" });
 
             var cart = CartHelper.GetCart(HttpContext.Session);
@@ -57,7 +57,7 @@ namespace BoutiquePortal.Web.Areas.Shop.Controllers
         {
             // Auth check
             if (HttpContext.Session.GetString("Role") != "Customer")
-                return RedirectToAction("Login", "Account",
+                return RedirectToAction("Login", "CustomerAccount",
                     new { area = "Customer" });
 
             int customerId = HttpContext.Session.GetInt32("CustomerId") ?? 0;
@@ -205,7 +205,7 @@ namespace BoutiquePortal.Web.Areas.Shop.Controllers
         public async Task<IActionResult> MyOrders()
         {
             if (HttpContext.Session.GetString("Role") != "Customer")
-                return RedirectToAction("Login", "Account",
+                return RedirectToAction("Login", "CustomerAccount",
                     new { area = "Customer" });
 
             int customerId = HttpContext.Session.GetInt32("CustomerId") ?? 0;

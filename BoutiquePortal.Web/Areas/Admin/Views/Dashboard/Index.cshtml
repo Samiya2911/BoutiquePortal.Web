@@ -1,11 +1,670 @@
-﻿@{
+﻿@model BoutiquePortal.Model.ViewModels.AdminDashboardVM
+@using System.Text.Json
+@{
     Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+    ViewBag.Title = "Dashboard";
+
+    // ✅ Serialize chart data safely for JS
+    var monthLabels = JsonSerializer.Serialize(
+        Model.MonthlyRevenue.Select(m => m.MonthName).ToList());
+    var monthRevenue = JsonSerializer.Serialize(
+        Model.MonthlyRevenue.Select(m => m.Revenue).ToList());
+    var monthOrders = JsonSerializer.Serialize(
+        Model.MonthlyRevenue.Select(m => m.OrderCount).ToList());
+
+    var statusLabels = JsonSerializer.Serialize(
+        Model.OrderStatusBreakdown.Select(s => s.OrderStatus).ToList());
+    var statusCounts = JsonSerializer.Serialize(
+        Model.OrderStatusBreakdown.Select(s => s.Count).ToList());
+
+    var topProductNames = JsonSerializer.Serialize(
+        Model.TopProducts.Select(p => p.ProductName).ToList());
+    var topProductSold = JsonSerializer.Serialize(
+        Model.TopProducts.Select(p => p.TotalSold).ToList());
+    var topProductRevenue = JsonSerializer.Serialize(
+        Model.TopProducts.Select(p => p.TotalRevenue).ToList());
 }
 
 <div class="pagetitle">
-    <h1>Admin Dashboard</h1>
+    <h1>Dashboard</h1>
+    <nav>
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item active">
+                Welcome back, @Context.Session.GetString("AdminName")! 👋
+            </li>
+        </ol>
+    </nav>
 </div>
 
 <section class="section dashboard">
-    <h2>Welcome to Boutique Admin Panel 🎉</h2>
+
+    <!-- ================== STATS CARDS ROW ================== -->
+    <div class="row">
+
+        <!-- Total Revenue -->
+        <div class="col-xxl-4 col-md-6">
+            <div class="card info-card revenue-card">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        Total Revenue
+                        <span>| All Time</span>
+                    </h5>
+                    <div class="d-flex align-items-center">
+                        <div class="card-icon rounded-circle d-flex
+                                    align-items-center justify-content-center">
+                            <i class="bi bi-currency-rupee"></i>
+                        </div>
+                        <div class="ps-3">
+                            <h6>&#8377;@Model.TotalRevenue.ToString("N0")</h6>
+                            <span class="text-success small fw-bold">
+                                &#8377;@Model.ThisMonthRevenue.ToString("N0")
+                            </span>
+                            <span class="text-muted small">this month</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Total Orders -->
+        <div class="col-xxl-4 col-md-6">
+            <div class="card info-card sales-card">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        Orders
+                        <span>| Total</span>
+                    </h5>
+                    <div class="d-flex align-items-center">
+                        <div class="card-icon rounded-circle d-flex
+                                    align-items-center justify-content-center">
+                            <i class="bi bi-cart"></i>
+                        </div>
+                        <div class="ps-3">
+                            <h6>@Model.TotalOrders</h6>
+                            @if (Model.PendingOrders > 0)
+                            {
+                                <span class="text-warning small fw-bold">
+                                    @Model.PendingOrders pending
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="text-success small fw-bold">
+                                    All fulfilled ✅
+                                </span>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Total Customers -->
+        <div class="col-xxl-4 col-md-6">
+            <div class="card info-card customers-card">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        Customers
+                        <span>| Active</span>
+                    </h5>
+                    <div class="d-flex align-items-center">
+                        <div class="card-icon rounded-circle d-flex
+                                    align-items-center justify-content-center">
+                            <i class="bi bi-people"></i>
+                        </div>
+                        <div class="ps-3">
+                            <h6>@Model.TotalCustomers</h6>
+                            <span class="text-muted small">
+                                registered customers
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Total Products -->
+        <div class="col-xxl-4 col-md-6">
+            <div class="card info-card">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        Products
+                        <span>| Active</span>
+                    </h5>
+                    <div class="d-flex align-items-center">
+                        <div class="card-icon rounded-circle d-flex
+                                    align-items-center justify-content-center">
+                            <i class="bi bi-box-seam"></i>
+                        </div>
+                        <div class="ps-3">
+                            <h6>@Model.TotalProducts</h6>
+                            <span class="text-muted small">
+                                active listings
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Total Vendors -->
+        <div class="col-xxl-4 col-md-6">
+            <div class="card info-card">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        Vendors
+                        <span>| Active</span>
+                    </h5>
+                    <div class="d-flex align-items-center">
+                        <div class="card-icon rounded-circle d-flex
+                                    align-items-center justify-content-center">
+                            <i class="bi bi-shop"></i>
+                        </div>
+                        <div class="ps-3">
+                            <h6>@Model.TotalVendors</h6>
+                            @if (Model.PendingVendors > 0)
+                            {
+                                <span class="text-danger small fw-bold">
+                                    @Model.PendingVendors awaiting approval
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="text-success small">
+                                    All approved ✅
+                                </span>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pending Alerts Card -->
+        @if (Model.PendingOrders > 0 || Model.PendingVendors > 0)
+        {
+            <div class="col-xxl-4 col-md-6">
+                <div class="card"
+                     style="border-left: 4px solid #ffc107;">
+                    <div class="card-body">
+                        <h5 class="card-title text-warning">
+                            ⚠️ Action Required
+                        </h5>
+                        @if (Model.PendingVendors > 0)
+                        {
+                            <p class="mb-2">
+                                <a href="/Admin/Vendor"
+                                   class="text-danger fw-bold">
+                                    @Model.PendingVendors vendor(s)
+                                </a>
+                                waiting for approval
+                            </p>
+                        }
+                        @if (Model.PendingOrders > 0)
+                        {
+                            <p class="mb-0">
+                                <a href="/Admin/Order"
+                                   class="text-warning fw-bold">
+                                    @Model.PendingOrders order(s)B
+                                </a>
+                                pending processing
+                            </p>
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+
+    </div>
+
+    <!-- ================== CHARTS ROW 1 ================== -->
+    <div class="row">
+
+        <!-- Monthly Revenue Line Chart -->
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        Revenue & Orders
+                        <span>| Last 6 Months</span>
+                    </h5>
+                    <div id="revenueChart"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Order Status Donut Chart -->
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        Order Status
+                        <span>| Breakdown</span>
+                    </h5>
+                    @if (Model.OrderStatusBreakdown.Any())
+                    {
+                        <div id="orderStatusChart"></div>
+                    }
+                    else
+                    {
+                        <div class="text-center py-4 text-muted">
+                            <i class="bi bi-cart-x fs-1"></i>
+                            <p class="mt-2">No orders yet</p>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- ================== CHARTS ROW 2 ================== -->
+    <div class="row">
+
+        <!-- Top Products Bar Chart -->
+        <div class="col-lg-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        Top Selling Products
+                        <span>| By Units Sold</span>
+                    </h5>
+                    @if (Model.TopProducts.Any())
+                    {
+                        <canvas id="topProductsChart"
+                                style="max-height:300px;"></canvas>
+                    }
+                    else
+                    {
+                        <div class="text-center py-4 text-muted">
+                            <i class="bi bi-bar-chart fs-1"></i>
+                            <p class="mt-2">No sales data yet</p>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Revenue by Product -->
+        <div class="col-lg-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        Revenue by Product
+                        <span>| Top 5</span>
+                    </h5>
+                    @if (Model.TopProducts.Any())
+                    {
+                        <canvas id="productRevenueChart"
+                                style="max-height:300px;"></canvas>
+                    }
+                    else
+                    {
+                        <div class="text-center py-4 text-muted">
+                            <i class="bi bi-graph-up fs-1"></i>
+                            <p class="mt-2">No revenue data yet</p>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- ================== RECENT ORDERS TABLE ================== -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card recent-sales overflow-auto">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        Recent Orders
+                        <span>| Latest 5</span>
+                    </h5>
+
+                    @if (!Model.RecentOrders.Any())
+                    {
+                        <div class="text-center py-4 text-muted">
+                            <i class="bi bi-inbox fs-1"></i>
+                            <p class="mt-2">No orders yet</p>
+                        </div>
+                    }
+                    else
+                    {
+                        <table class="table table-borderless
+                                          datatable align-middle">
+                            <thead>
+                                <tr>
+                                    <th scope="col">#</th>
+                                    <th scope="col">Customer</th>
+                                    <th scope="col">Amount</th>
+                                    <th scope="col">Order Status</th>
+                                    <th scope="col">Payment</th>
+                                    <th scope="col">Date</th>
+                                    <th scope="col">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var order in Model.RecentOrders)
+                                {
+                                    <tr>
+                                        <td>
+                                            <a href="/Admin/Order/Details/@order.OrderId"
+                                               class="text-primary fw-bold">
+                                                #@order.OrderId
+                                            </a>
+                                        </td>
+                                        <td>@order.CustomerName</td>
+                                        <td>
+                                            <strong>
+                                                &#8377;@order.TotalAmount.ToString("N2")
+                                            </strong>
+                                        </td>
+                                        <td>
+                                            @{
+                                                var oc = order.OrderStatus switch
+                                                {
+                                                    "Pending" => "warning",
+                                                    "Confirmed" => "primary",
+                                                    "Shipped" => "info",
+                                                    "Delivered" => "success",
+                                                    "Cancelled" => "danger",
+                                                    _ => "secondary"
+                                                };
+                                            }
+                                            <span class="badge bg-@oc">
+                                                @order.OrderStatus
+                                            </span>
+                                        </td>
+                                        <td>
+                                            @{
+                                                var pc = order.PaymentStatus
+                                                == "Paid" ? "success" : "warning";
+                                            }
+                                            <span class="badge bg-@pc">
+                                                @order.PaymentStatus
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <small>
+                                                @order.OrderDate
+                                                .ToString("dd MMM yyyy")
+                                            </small>
+                                        </td>
+                                        <td>
+                                            <a href="/Admin/Order/Details/@order.OrderId"
+                                               class="btn btn-sm btn-outline-primary">
+                                                <i class="bi bi-eye"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+
+                        <div class="text-end mt-2">
+                            <a href="/Admin/Order"
+                               class="btn btn-sm btn-primary">
+                                View All Orders →
+                            </a>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================== QUICK LINKS ROW ================== -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Quick Actions</h5>
+                    <div class="d-flex gap-2 flex-wrap">
+                        <a href="/Admin/Vendor/AddEdit"
+                           class="btn btn-outline-primary">
+                            <i class="bi bi-person-plus"></i>
+                            Add Vendor
+                        </a>
+                        <a href="/Admin/Product/AddEdit"
+                           class="btn btn-outline-success">
+                            <i class="bi bi-box-seam"></i>
+                            Add Product
+                        </a>
+                        <a href="/Admin/Vendor"
+                           class="btn btn-outline-warning">
+                            <i class="bi bi-person-check"></i>
+                            Approve Vendors
+                            @if (Model.PendingVendors > 0)
+                            {
+                                <span class="badge bg-danger ms-1">
+                                    @Model.PendingVendors
+                                </span>
+                            }
+                        </a>
+                        <a href="/Admin/Order"
+                           class="btn btn-outline-info">
+                            <i class="bi bi-cart"></i>
+                            Manage Orders
+                            @if (Model.PendingOrders > 0)
+                            {
+                                <span class="badge bg-danger ms-1">
+                                    @Model.PendingOrders
+                                </span>
+                            }
+                        </a>
+                        <a href="/Admin/Customer"
+                           class="btn btn-outline-secondary">
+                            <i class="bi bi-people"></i>
+                            View Customers
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
 </section>
+
+@section Scripts {
+    <script>
+        // ============================================================
+        // DATA FROM SERVER (safely passed via Razor)
+        // ============================================================
+        var monthLabels      = @Html.Raw(monthLabels);
+        var monthRevenue     = @Html.Raw(monthRevenue);
+        var monthOrders      = @Html.Raw(monthOrders);
+        var statusLabels     = @Html.Raw(statusLabels);
+        var statusCounts     = @Html.Raw(statusCounts);
+        var topProductNames  = @Html.Raw(topProductNames);
+        var topProductSold   = @Html.Raw(topProductSold);
+        var topProductRev    = @Html.Raw(topProductRevenue);
+
+        // ============================================================
+        // 1. REVENUE & ORDERS — ApexCharts Line Chart
+        // ============================================================
+        if (monthLabels.length > 0) {
+            var revenueOptions = {
+                series: [
+                    {
+                        name: 'Revenue (₹)',
+                        type: 'area',
+                        data: monthRevenue
+                    },
+                    {
+                        name: 'Orders',
+                        type: 'line',
+                        data: monthOrders
+                    }
+                ],
+                chart: {
+                    height: 300,
+                    type: 'line',
+                    toolbar: { show: false }
+                },
+                colors: ['#4154f1', '#ff771d'],
+                stroke: { width: [2, 3], curve: 'smooth' },
+                fill: {
+                    type: ['gradient', 'solid'],
+                    gradient: {
+                        shade: 'light',
+                        type: 'vertical',
+                        opacityFrom: 0.4,
+                        opacityTo: 0
+                    }
+                },
+                xaxis: { categories: monthLabels },
+                yaxis: [
+                    {
+                        title: { text: 'Revenue (₹)' },
+                        labels: {
+                            formatter: val => '₹' + val.toLocaleString('en-IN')
+                        }
+                    },
+                    {
+                        opposite: true,
+                        title: { text: 'Orders' }
+                    }
+                ],
+                tooltip: {
+                    y: [
+                        {
+                            formatter: val =>
+                                '₹' + val.toLocaleString('en-IN',
+                                    { minimumFractionDigits: 2 })
+                        },
+                        { formatter: val => val + ' orders' }
+                    ]
+                },
+                legend: { position: 'top' }
+            };
+
+            new ApexCharts(
+                document.getElementById('revenueChart'),
+                revenueOptions
+            ).render();
+        }
+
+        // ============================================================
+        // 2. ORDER STATUS — ApexCharts Donut Chart
+        // ============================================================
+        if (statusLabels.length > 0) {
+            var statusOptions = {
+                series: statusCounts,
+                chart: { height: 300, type: 'donut' },
+                labels: statusLabels,
+                colors: ['#ffc107', '#0d6efd', '#0dcaf0',
+                         '#198754', '#dc3545', '#6c757d'],
+                legend: { position: 'bottom' },
+                plotOptions: {
+                    pie: {
+                        donut: {
+                            size: '60%',
+                            labels: {
+                                show: true,
+                                total: {
+                                    show: true,
+                                    label: 'Total',
+                                    formatter: w =>
+                                        w.globals.seriesTotals
+                                         .reduce((a, b) => a + b, 0)
+                                }
+                            }
+                        }
+                    }
+                },
+                responsive: [{
+                    breakpoint: 480,
+                    options: { chart: { height: 250 } }
+                }]
+            };
+
+            new ApexCharts(
+                document.getElementById('orderStatusChart'),
+                statusOptions
+            ).render();
+        }
+
+        // ============================================================
+        // 3. TOP PRODUCTS — Chart.js Bar Chart
+        // ============================================================
+        if (topProductNames.length > 0) {
+            var ctx1 = document.getElementById('topProductsChart');
+            if (ctx1) {
+                new Chart(ctx1, {
+                    type: 'bar',
+                    data: {
+                        labels: topProductNames,
+                        datasets: [{
+                            label: 'Units Sold',
+                            data: topProductSold,
+                            backgroundColor: [
+                                'rgba(65,84,241,0.8)',
+                                'rgba(255,119,29,0.8)',
+                                'rgba(25,135,84,0.8)',
+                                'rgba(220,53,69,0.8)',
+                                'rgba(13,202,240,0.8)'
+                            ],
+                            borderRadius: 6,
+                            borderSkipped: false
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: { display: false }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: { stepSize: 1 }
+                            }
+                        }
+                    }
+                });
+            }
+
+            // ============================================================
+            // 4. REVENUE BY PRODUCT — Chart.js Horizontal Bar
+            // ============================================================
+            var ctx2 = document.getElementById('productRevenueChart');
+            if (ctx2) {
+                new Chart(ctx2, {
+                    type: 'bar',
+                    data: {
+                        labels: topProductNames,
+                        datasets: [{
+                            label: 'Revenue (₹)',
+                            data: topProductRev,
+                            backgroundColor: 'rgba(25,135,84,0.8)',
+                            borderRadius: 6,
+                            borderSkipped: false
+                        }]
+                    },
+                    options: {
+                        indexAxis: 'y',   // horizontal bar
+                        responsive: true,
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: {
+                                callbacks: {
+                                    label: ctx =>
+                                        '₹' + ctx.raw.toLocaleString('en-IN',
+                                            { minimumFractionDigits: 2 })
+                                }
+                            }
+                        },
+                        scales: {
+                            x: {
+                                beginAtZero: true,
+                                ticks: {
+                                    callback: val =>
+                                        '₹' + val.toLocaleString('en-IN')
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+        }
+    </script>
+}

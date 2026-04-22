@@ -28,7 +28,7 @@ namespace BoutiquePortal.Repositories.Repository
             using var conn = new SqlConnection(_connectionString);
 
             return await conn.QueryAsync<SubCategory>(
-                "sp_GetAllSubCategories",
+                "sp_SubCategories_GetAll",
                 commandType: CommandType.StoredProcedure
             );
         }
@@ -39,7 +39,7 @@ namespace BoutiquePortal.Repositories.Repository
             using var conn = new SqlConnection(_connectionString);
 
             return await conn.QueryFirstOrDefaultAsync<SubCategory>(
-                "sp_GetSubCategoryById",
+                "sp_SubCategory_GetById",
                 new { SubCategoryId = id },
                 commandType: CommandType.StoredProcedure
             ) ?? new SubCategory();
@@ -59,7 +59,7 @@ namespace BoutiquePortal.Repositories.Repository
             p.Add("@CreatedDate", entity.CreatedDate);
 
             return await conn.ExecuteScalarAsync<int>(
-                "sp_AddSubCategory",
+                "sp_SubCategory_Insert",
                 p,
                 commandType: CommandType.StoredProcedure
             );
@@ -79,7 +79,7 @@ namespace BoutiquePortal.Repositories.Repository
             p.Add("@IsActive", entity.IsActive);
 
             return await conn.ExecuteScalarAsync<int>(
-                "sp_UpdateSubCategory",
+                "sp_SubCategory_Update",
                 p,
                 commandType: CommandType.StoredProcedure
             );
@@ -91,7 +91,7 @@ namespace BoutiquePortal.Repositories.Repository
             using var conn = new SqlConnection(_connectionString);
 
             return await conn.ExecuteScalarAsync<int>(
-                "sp_DeleteSubCategory",
+                "sp_SubCategory_Delete",
                 new { SubCategoryId = id },
                 commandType: CommandType.StoredProcedure
             );

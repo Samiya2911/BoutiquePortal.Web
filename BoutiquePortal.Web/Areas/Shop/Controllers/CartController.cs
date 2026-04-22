@@ -27,7 +27,7 @@ namespace BoutiquePortal.Web.Areas.Shop.Controllers
             if (HttpContext.Session.GetString("Role") != "Customer")
             {
                 TempData["CartMsg"] = "Please login to add items to cart.";
-                return RedirectToAction("Login", "Account",
+                return RedirectToAction("Login", "CustomerAccount",
                     new { area = "Customer" });
             }
 

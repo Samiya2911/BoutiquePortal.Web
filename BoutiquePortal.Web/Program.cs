@@ -20,6 +20,9 @@ builder.Services.AddSession(options =>
 
 
 //// Dependency Injection (Repositories)  (Services)
+// Admin Dashboard
+builder.Services.AddScoped<IAdminDashboardRepository, AdminDashboardRepository>();
+builder.Services.AddScoped<IAdminDashboardService, AdminDashboardService>();
 
 // Auth
 builder.Services.AddScoped<IAuthRepository, AuthRepository>();
@@ -96,7 +99,7 @@ app.UseAuthorization();
 //app.MapControllerRoute(
 //    name: "areas",
 //    pattern: "{area:exists}/{controller=Dashboard}/{action=Index}/{id?}");
-
+        
 app.MapGet("/", context =>
 {
     context.Response.Redirect("/Shop/Home");
