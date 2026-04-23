@@ -61,8 +61,8 @@ builder.Services.AddScoped<ICityRepository, CityRepository>();
 builder.Services.AddScoped<ICityService, CityService>();
 
 // Cart
-//// builder.Services.AddScoped<ICartRepository, CartRepository>();
-//// builder.Services.AddScoped<ICartService, CartService>();
+builder.Services.AddScoped<ICartRepository, CartRepository>();
+builder.Services.AddScoped<ICartService, CartService>();
 
 // Order
 builder.Services.AddScoped<IOrderRepository, OrderRepository>();

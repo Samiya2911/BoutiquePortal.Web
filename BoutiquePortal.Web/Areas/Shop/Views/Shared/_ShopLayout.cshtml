@@ -99,7 +99,7 @@
 
 
                 <!-- ✅ In _ShopLayout.cshtml header-left section -->
-                <div class="header-left">
+               @*  <div class="header-left">
                     <ul>
                         @if (Context.Session.GetString("Role") == "Customer")
                         {
@@ -121,10 +121,73 @@
                             <li>
                                 <a href="/Customer/CustomerAccount/Register">Register</a>
                             </li>
-                            @* <li>
-                                <a href="/Customer/Customer/Profile">View Profile</a>
+                           
+                        }
+                    </ul>
+
+                    <!-- Cart -->
+                    <div class="cart box_1">
+                        <a href="/Shop/Cart">
+                            <h3>
+                                <div class="total">
+                                    @{
+                                        var cartCount = BoutiquePortal.Web.Helpers.CartHelper
+                                        .GetCartCount(Context.Session);
+                                        var cartTotal = BoutiquePortal.Web.Helpers.CartHelper
+                                        .GetCartTotal(Context.Session);
+                                    }
+                                    @if (cartCount > 0)
+                                    {
+                                        <span>&#8377;@cartTotal.ToString("N2")</span>
+                                        <span>
+                                            (@cartCount item@(cartCount != 1 ? "s" : ""))
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span>Cart (0 items)</span>
+                                    }
+                                </div>
+                                <img src="~/shop/images/cart.png" alt="" />
+                            </h3>
+                        </a>
+                        @if (cartCount > 0)
+                        {
+                            <p><a href="/Shop/Cart/Clear">Empty Cart</a></p>
+                        }
+                    </div>
+                    <div class="clearfix"></div>
+                </div> *@
+                <div class="header-left">
+                    <ul>
+                        @if (Context.Session.GetString("Role") == "Customer")
+                        {
+                            <!-- ✅ Logged in — show name, profile, orders, logout -->
+                            <li>
+                                <a href="/Shop/Checkout/MyOrders">
+                                    📋 My Orders
+                                </a>
                             </li>
-     *@
+                            <li>
+                                <a href="/Customer/Profile">
+                                    👤 @Context.Session.GetString("CustomerName")
+                                </a>
+                            </li>
+                            <li>
+                                <a href="/Customer/CustomerAccount/Logout">
+                                    Logout
+                                </a>
+                            </li>
+                        }
+                        else
+                        {
+                            <!-- ✅ Not logged in -->
+                            <li>
+                                <a href="/Home/Index">Login</a>
+                            </li>
+                            <li>
+                                <a href="/Customer/CustomerAccount/Register">Register</a>
+                            </li>
                         }
                     </ul>
 
@@ -161,7 +224,6 @@
                     </div>
                     <div class="clearfix"></div>
                 </div>
-
 
                 <div class="clearfix"></div>
             </div>

@@ -9,9 +9,15 @@ namespace BoutiquePortal.Web.Areas.Shop.Controllers
     public class CartController : Controller
     {
         private readonly IProductService _productService;
+        private readonly ICartService _cartService;    
 
-        public CartController(IProductService productService)
-            => _productService = productService;
+        public CartController(
+            IProductService productService,
+            ICartService cartService)             
+        {
+            _productService = productService;
+            _cartService = cartService;
+        }
 
         // ======= VIEW CART =======
         public IActionResult Index()
@@ -60,16 +66,56 @@ namespace BoutiquePortal.Web.Areas.Shop.Controllers
 
             CartHelper.AddItem(HttpContext.Session, cartItem);
 
+            int customerId = HttpContext.Session.GetInt32("CustomerId") ?? 0;
+            if (customerId > 0)
+            {
+                await _cartService.AddToCartAsync(
+                    customerId, product.ProductId, qty);
+            }
+
             TempData["CartMsg"] = $"'{product.ProductName}' added to cart!";
             return RedirectToAction(nameof(Index));
         }
 
         // ======= UPDATE QUANTITY (AJAX) =======
+        //[HttpPost]
+        //[IgnoreAntiforgeryToken]
+        //public IActionResult UpdateQty(int productId, int quantity)
+        //{
+        //    CartHelper.UpdateQuantity(HttpContext.Session, productId, quantity);
+
+        //    int customerId = HttpContext.Session.GetInt32("CustomerId") ?? 0;
+        //    if (customerId > 0)
+        //    {
+        //        await _cartService.UpdateQuantityAsync(
+        //            customerId, productId, quantity);
+        //    }
+
+
+        //    var cart = CartHelper.GetCart(HttpContext.Session);
+        //    var item = cart.FirstOrDefault(c => c.ProductId == productId);
+        //    var total = CartHelper.GetCartTotal(HttpContext.Session);
+
+        //    return Json(new
+        //    {
+        //        success = true,
+        //        subTotal = item?.SubTotal.ToString("N2") ?? "0.00",
+        //        cartTotal = total.ToString("N2"),
+        //        cartCount = CartHelper.GetCartCount(HttpContext.Session)
+        //    });
+        //}
+
         [HttpPost]
         [IgnoreAntiforgeryToken]
-        public IActionResult UpdateQty(int productId, int quantity)
+        public async Task<IActionResult> UpdateQty(int productId, int quantity)
         {
             CartHelper.UpdateQuantity(HttpContext.Session, productId, quantity);
+
+            int customerId = HttpContext.Session.GetInt32("CustomerId") ?? 0;
+            if (customerId > 0)
+            {
+                await _cartService.UpdateQuantityAsync(customerId, productId, quantity);
+            }
 
             var cart = CartHelper.GetCart(HttpContext.Session);
             var item = cart.FirstOrDefault(c => c.ProductId == productId);
@@ -84,12 +130,20 @@ namespace BoutiquePortal.Web.Areas.Shop.Controllers
             });
         }
 
+
         // ======= REMOVE ITEM (AJAX) =======
+
         [HttpPost]
         [IgnoreAntiforgeryToken]
-        public IActionResult Remove(int productId)
+        public async Task<IActionResult> Remove(int productId)
         {
             CartHelper.RemoveItem(HttpContext.Session, productId);
+
+            int customerId = HttpContext.Session.GetInt32("CustomerId") ?? 0;
+            if (customerId > 0)
+            {
+                await _cartService.RemoveItemAsync(customerId, productId);
+            }
 
             var total = CartHelper.GetCartTotal(HttpContext.Session);
             var count = CartHelper.GetCartCount(HttpContext.Session);
@@ -102,10 +156,47 @@ namespace BoutiquePortal.Web.Areas.Shop.Controllers
             });
         }
 
+        //[HttpPost]
+        //[IgnoreAntiforgeryToken]
+        //public IActionResult Remove(int productId)
+        //{
+        //    CartHelper.RemoveItem(HttpContext.Session, productId);
+
+        //    int customerId = HttpContext.Session.GetInt32("CustomerId") ?? 0;
+        //    if (customerId > 0)
+        //    {
+        //        await _cartService.RemoveItemAsync(customerId, productId);
+        //    }
+
+        //    var total = CartHelper.GetCartTotal(HttpContext.Session);
+        //    var count = CartHelper.GetCartCount(HttpContext.Session);
+
+        //    return Json(new
+        //    {
+        //        success = true,
+        //        cartTotal = total.ToString("N2"),
+        //        cartCount = count
+        //    });
+        //}
+
         // ======= CLEAR CART =======
-        public IActionResult Clear()
+        //public IActionResult Clear()    
+        //{
+        //    CartHelper.ClearCart(HttpContext.Session);
+        //    return RedirectToAction(nameof(Index));
+        //}
+        public async Task<IActionResult> Clear()
         {
+            // ✅ Clear Session
             CartHelper.ClearCart(HttpContext.Session);
+
+            // ✅ Clear DB if logged in
+            int customerId = HttpContext.Session.GetInt32("CustomerId") ?? 0;
+            if (customerId > 0)
+            {
+                await _cartService.ClearCartAsync(customerId);
+            }
+
             return RedirectToAction(nameof(Index));
         }
 

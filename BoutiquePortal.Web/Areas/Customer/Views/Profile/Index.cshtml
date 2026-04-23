@@ -1,4 +1,4 @@
-﻿@model BoutiquePortal.Model.ViewModels.CustomerProfileVM
+﻿@* @model BoutiquePortal.Model.ViewModels.CustomerProfileVM
 @{
     Layout = "~/Areas/Customer/Views/Shared/_CustomerLayout.cshtml";
     ViewBag.Title = "My Profile";
@@ -136,4 +136,245 @@
         </div>
 
     </div>
-</section>
+</section> *@
+
+
+
+@model BoutiquePortal.Model.ViewModels.CustomerProfileVM
+@{
+    Layout = "~/Areas/Shop/Views/Shared/_ShopLayout.cshtml";
+    ViewBag.Title = "My Profile";
+}
+
+<div class="container" style="padding: 40px 0;">
+
+    <!-- Breadcrumb -->
+    <nav style="margin-bottom:20px;">
+        <a href="/Shop/Home" style="color:#888; text-decoration:none;">
+            Home
+        </a>
+        <span style="color:#bbb; margin:0 8px;">›</span>
+        <span style="color:#333; font-weight:600;">My Profile</span>
+    </nav>
+
+    <h2 style="margin-bottom:25px;">
+        👤 My Profile
+    </h2>
+
+    <!-- ✅ Success / Error Alerts -->
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show"
+             role="alert">
+            ✅ @TempData["Success"]
+            <button type="button" class="btn-close"
+                    data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <div class="row">
+
+        <!-- ======= LEFT: PROFILE INFO ======= -->
+        <div class="col-md-6" style="margin-bottom:20px;">
+            <div class="cart-header" style="padding:25px;">
+
+                <h4 style="border-bottom:2px solid #eee;
+                           padding-bottom:12px; margin-bottom:20px;">
+                    ✏️ Edit Profile
+                </h4>
+
+                @if (!ViewData.ModelState.IsValid)
+                {
+                    <div class="alert alert-danger small py-2">
+                        @foreach (var error in ViewData.ModelState.Values
+                                            .SelectMany(v => v.Errors))
+                        {
+                            <div>⚠️ @error.ErrorMessage</div>
+                        }
+                    </div>
+                }
+
+                <form method="post"
+                      action="/Customer/Profile">
+                    @Html.AntiForgeryToken()
+
+                    <!-- Full Name -->
+                    <div style="margin-bottom:15px;">
+                        <label style="font-weight:600; display:block;
+                                      margin-bottom:5px;">
+                            Full Name *
+                        </label>
+                        <input type="text"
+                               name="FullName"
+                               value="@Model.FullName"
+                               class="form-control"
+                               placeholder="Your full name" />
+                    </div>
+
+                    <!-- Email (read only) -->
+                    <div style="margin-bottom:15px;">
+                        <label style="font-weight:600; display:block;
+                                      margin-bottom:5px;">
+                            Email Address
+                        </label>
+                        <input type="email"
+                               name="Email"
+                               value="@Model.Email"
+                               class="form-control"
+                               readonly
+                               style="background:#f8f9fa; color:#888;" />
+                        <small style="color:#aaa;">
+                            Email cannot be changed
+                        </small>
+                    </div>
+
+                    <!-- Phone -->
+                    <div style="margin-bottom:20px;">
+                        <label style="font-weight:600; display:block;
+                                      margin-bottom:5px;">
+                            Phone *
+                        </label>
+                        <input type="text"
+                               name="Phone"
+                               value="@Model.Phone"
+                               class="form-control"
+                               placeholder="9876543210" />
+                    </div>
+
+                    <button type="submit"
+                            class="btn btn-primary w-100">
+                        💾 Save Changes
+                    </button>
+                </form>
+
+            </div>
+        </div>
+
+        <!-- ======= RIGHT: CHANGE PASSWORD ======= -->
+        <div class="col-md-6" style="margin-bottom:20px;">
+            <div class="cart-header" style="padding:25px;">
+
+                <h4 style="border-bottom:2px solid #eee;
+                           padding-bottom:12px; margin-bottom:20px;">
+                    🔒 Change Password
+                </h4>
+
+                @if (TempData["PasswordSuccess"] != null)
+                {
+                    <div class="alert alert-success small py-2">
+                        ✅ @TempData["PasswordSuccess"]
+                    </div>
+                }
+
+                @if (TempData["PasswordError"] != null)
+                {
+                    <div class="alert alert-danger small py-2">
+                        ⚠️ @TempData["PasswordError"]
+                    </div>
+                }
+
+                <form method="post"
+                      action="/Customer/Profile/ChangePassword">
+                    @Html.AntiForgeryToken()
+
+                    <!-- Current Password -->
+                    <div style="margin-bottom:15px;">
+                        <label style="font-weight:600; display:block;
+                                      margin-bottom:5px;">
+                            Current Password *
+                        </label>
+                        <input type="password"
+                               name="CurrentPassword"
+                               class="form-control"
+                               placeholder="Enter current password" />
+                    </div>
+
+                    <!-- New Password -->
+                    <div style="margin-bottom:15px;">
+                        <label style="font-weight:600; display:block;
+                                      margin-bottom:5px;">
+                            New Password *
+                        </label>
+                        <input type="password"
+                               name="NewPassword"
+                               id="newPass"
+                               class="form-control"
+                               placeholder="Min 6 characters" />
+                    </div>
+
+                    <!-- Confirm Password -->
+                    <div style="margin-bottom:20px;">
+                        <label style="font-weight:600; display:block;
+                                      margin-bottom:5px;">
+                            Confirm New Password *
+                        </label>
+                        <input type="password"
+                               name="ConfirmNewPassword"
+                               id="confirmPass"
+                               class="form-control"
+                               placeholder="Re-enter new password" />
+                        <small id="passMatch"
+                               style="display:none; color:red;">
+                            Passwords do not match
+                        </small>
+                    </div>
+
+                    <button type="submit"
+                            class="btn btn-warning w-100"
+                            id="changePassBtn">
+                        🔑 Change Password
+                    </button>
+                </form>
+
+            </div>
+        </div>
+
+    </div>
+
+    <!-- ======= QUICK LINKS ======= -->
+    <div class="cart-header" style="padding:20px; margin-top:5px;">
+        <h5 style="margin-bottom:15px;">Quick Links</h5>
+        <div style="display:flex; gap:10px; flex-wrap:wrap;">
+            <a href="/Shop/Checkout/MyOrders"
+               class="btn btn-outline-primary btn-sm">
+                📋 My Orders
+            </a>
+            <a href="/Shop/Shop"
+               class="btn btn-outline-success btn-sm">
+                🛍️ Continue Shopping
+            </a>
+            <a href="/Customer/Account/Logout"
+               class="btn btn-outline-danger btn-sm">
+                🚪 Logout
+            </a>
+        </div>
+    </div>
+
+</div>
+
+@section Scripts {
+    <script>
+        // ✅ Real-time password match check
+        var newPass     = document.getElementById('newPass');
+        var confirmPass = document.getElementById('confirmPass');
+        var matchMsg    = document.getElementById('passMatch');
+        var submitBtn   = document.getElementById('changePassBtn');
+
+        function checkMatch() {
+            if (confirmPass.value.length > 0) {
+                if (newPass.value !== confirmPass.value) {
+                    matchMsg.style.display  = 'block';
+                    submitBtn.disabled      = true;
+                    confirmPass.style.border = '1px solid red';
+                } else {
+                    matchMsg.style.display  = 'none';
+                    submitBtn.disabled      = false;
+                    confirmPass.style.border = '1px solid green';
+                }
+            }
+        }
+
+        newPass.addEventListener('input', checkMatch);
+        confirmPass.addEventListener('input', checkMatch);
+    </script>
+}

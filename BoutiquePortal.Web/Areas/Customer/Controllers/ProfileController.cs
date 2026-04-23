@@ -40,6 +40,7 @@ namespace BoutiquePortal.Web.Areas.Customer.Controllers
         // ======= UPDATE PROFILE POST =======
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [ActionName("Index")]
         public async Task<IActionResult> Index(CustomerProfileVM model)
         {
             int customerId = HttpContext.Session.GetInt32("CustomerId") ?? 0;
@@ -48,6 +49,7 @@ namespace BoutiquePortal.Web.Areas.Customer.Controllers
             model.CustomerId = customerId;
             model.FullName = Request.Form["FullName"].ToString().Trim();
             model.Phone = Request.Form["Phone"].ToString().Trim();
+            model.Email = Request.Form["Email"].ToString().Trim();
 
             ModelState.Clear();
 
@@ -84,15 +86,22 @@ namespace BoutiquePortal.Web.Areas.Customer.Controllers
         }
 
         // ======= CHANGE PASSWORD POST =======
+
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> ChangePassword(CustomerProfileVM model)
+        public async Task<IActionResult> ChangePassword()
         {
             int customerId = HttpContext.Session.GetInt32("CustomerId") ?? 0;
-
             var currentPassword = Request.Form["CurrentPassword"].ToString();
             var newPassword = Request.Form["NewPassword"].ToString();
             var confirmPassword = Request.Form["ConfirmNewPassword"].ToString();
+
+            if (string.IsNullOrWhiteSpace(currentPassword) ||
+                string.IsNullOrWhiteSpace(newPassword))
+            {
+                TempData["PasswordError"] = "All password fields are required.";
+                return RedirectToAction(nameof(Index));
+            }
 
             if (newPassword != confirmPassword)
             {
@@ -102,7 +111,8 @@ namespace BoutiquePortal.Web.Areas.Customer.Controllers
 
             if (newPassword.Length < 6)
             {
-                TempData["PasswordError"] = "Password must be at least 6 characters.";
+                TempData["PasswordError"] =
+                    "Password must be at least 6 characters.";
                 return RedirectToAction(nameof(Index));
             }
 
@@ -117,5 +127,39 @@ namespace BoutiquePortal.Web.Areas.Customer.Controllers
 
             return RedirectToAction(nameof(Index));
         }
+
+        //[HttpPost]
+        //[ValidateAntiForgeryToken]
+        //public async Task<IActionResult> ChangePassword(CustomerProfileVM model)
+        //{
+        //    int customerId = HttpContext.Session.GetInt32("CustomerId") ?? 0;
+
+        //    var currentPassword = Request.Form["CurrentPassword"].ToString();
+        //    var newPassword = Request.Form["NewPassword"].ToString();
+        //    var confirmPassword = Request.Form["ConfirmNewPassword"].ToString();
+
+        //    if (newPassword != confirmPassword)
+        //    {
+        //        TempData["PasswordError"] = "New passwords do not match.";
+        //        return RedirectToAction(nameof(Index));
+        //    }
+
+        //    if (newPassword.Length < 6)
+        //    {
+        //        TempData["PasswordError"] = "Password must be at least 6 characters.";
+        //        return RedirectToAction(nameof(Index));
+        //    }
+
+        //    (bool success, string message) =
+        //        await _customerService.UpdatePasswordAsync(
+        //            customerId, currentPassword, newPassword);
+
+        //    if (!success)
+        //        TempData["PasswordError"] = message;
+        //    else
+        //        TempData["PasswordSuccess"] = message;
+
+        //    return RedirectToAction(nameof(Index));
+        //}
     }
 }

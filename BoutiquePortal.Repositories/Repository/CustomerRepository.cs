@@ -99,6 +99,16 @@ namespace BoutiquePortal.Repositories.Repository
                 commandType: CommandType.StoredProcedure);
         }
 
+       
+        public async Task<Customer?> GetByIdWithPasswordAsync(int customerId)
+        {
+            using var conn = new SqlConnection(_conn);
+            return await conn.QueryFirstOrDefaultAsync<Customer>(
+                "sp_Customer_GetByIdWithPassword",
+                new { CustomerId = customerId },
+                commandType: CommandType.StoredProcedure);
+        }
+
         // ======= DELETE =======
         public async Task<int> DeleteAsync(int customerId)
         {

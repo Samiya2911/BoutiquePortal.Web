@@ -1,6 +1,7 @@
 ﻿using BoutiquePortal.Model.Models;
 using BoutiquePortal.Model.ViewModels;
 using BoutiquePortal.Services.Interfaces;
+using BoutiquePortal.Services.Services;
 using BoutiquePortal.Web.Helpers;
 using Microsoft.AspNetCore.Mvc;
 
@@ -11,13 +12,16 @@ namespace BoutiquePortal.Web.Areas.Shop.Controllers
     {
         private readonly IOrderService _orderService;
         private readonly IProductService _productService;
+        private readonly ICartService _cartService;
 
         public CheckoutController(
             IOrderService orderService,
-            IProductService productService)
+            IProductService productService,
+            ICartService cartService)
         {
             _orderService = orderService;
             _productService = productService;
+            _cartService = cartService;
         }
 
         // ======= CHECKOUT GET =======
@@ -179,6 +183,10 @@ namespace BoutiquePortal.Web.Areas.Shop.Controllers
 
             // ======= CLEAR CART AFTER ORDER =======
             CartHelper.ClearCart(HttpContext.Session);
+
+            //  ADD THIS — also clear DB cart after order
+            if (customerId > 0)
+                await _cartService.ClearCartAsync(customerId);
 
             // ======= REDIRECT TO SUCCESS PAGE =======
             TempData["OrderId"] = orderId;
