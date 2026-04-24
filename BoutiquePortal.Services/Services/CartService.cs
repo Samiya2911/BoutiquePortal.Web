@@ -53,39 +53,5 @@ namespace BoutiquePortal.Services.Services
                 VendorId = d.VendorId
             }).ToList();
         }
-
-
-        //public async Task SyncSessionToDbAsync(int customerId, ISession session)
-        //{
-        //    var sessionCart = CartHelper.GetCart(session);
-
-        //    foreach (var item in sessionCart)
-        //    {
-        //        await _repo.AddOrUpdateAsync(
-        //            customerId, item.ProductId, item.Quantity);
-        //    }
-        //}
-
-        //// ✅ Load DB → Session (called on login)
-        //public async Task LoadDbToSessionAsync(int customerId, ISession session)
-        //{
-        //    var dbCart = await _repo.GetByCustomerAsync(customerId);
-
-        //    // Convert DB cart to Session CartItems
-        //    var sessionItems = dbCart.Select(d => new CartItem
-        //    {
-        //        ProductId = d.ProductId,
-        //        ProductName = d.ProductName,
-        //        BrandName = d.BrandName ?? string.Empty,
-        //        ProductImage = d.ProductImage ?? string.Empty,
-        //        Price = d.Price,
-        //        DiscountPrice = d.DiscountPrice,
-        //        Quantity = d.Quantity,
-        //        VendorId = d.VendorId
-        //    }).ToList();
-
-        //    // Save to session
-        //    CartHelper.SaveCart(session, sessionItems);
-        //}
     }
 }

@@ -1,11 +1,13 @@
 ﻿using BoutiquePortal.Model.Models;
 using BoutiquePortal.Services.Interfaces;
+using BoutiquePortal.Web.Filters;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BoutiquePortal.Web.Areas.Admin.Controllers
 {
     [Area("Admin")]
+    [AdminAuthFilter]
     public class ProductController : Controller
     {
         private readonly IProductService _service;
@@ -71,9 +73,7 @@ namespace BoutiquePortal.Web.Areas.Admin.Controllers
             model.ProductImage = Request.Form["ProductImage"].ToString();
             model.BrandName = Request.Form["BrandName"].ToString();  
             model.CategoryId = int.TryParse(Request.Form["CategoryId"], out int cid) ? cid : 0;
-            //model.SubCategoryId = int.TryParse(Request.Form["SubCategoryId"], out int sid) ? sid : 0;
-           
-            //  SubCategoryId is nullable — store null if not selected (not 0)
+ 
             model.SubCategoryId = int.TryParse(Request.Form["SubCategoryId"], out int scid) && scid > 0
                 ? scid
                 : (int?)null;
@@ -134,7 +134,7 @@ namespace BoutiquePortal.Web.Areas.Admin.Controllers
                     await imageFile.CopyToAsync(stream);
                 }
 
-                // ✅ Delete old image if updating
+                // Delete old image if updating
                 if (model.ProductId > 0 && !string.IsNullOrEmpty(model.ProductImage))
                 {
                     var oldPath = Path.Combine(_env.WebRootPath, "images", "product", model.ProductImage);
@@ -173,12 +173,6 @@ namespace BoutiquePortal.Web.Areas.Admin.Controllers
         // ================== AJAX ==================
 
         // ================== AJAX: SubCategories by Category ==================
-        //public async Task<JsonResult> GetSubCategoryByCategory(int categoryId)
-        //{
-        //    var data = await _subCategoryService.GetByCategoryId(categoryId);
-        //    return Json(data);
-        //}
-
         public async Task<JsonResult> GetSubCategoriesByCategory(int categoryId)
         {
             var data = await _subCategoryService.GetByCategoryId(categoryId);

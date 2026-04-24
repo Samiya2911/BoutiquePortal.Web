@@ -51,44 +51,6 @@
             });
         }
 
-        // ================== COUNTRY → STATE (ON CHANGE) ==================
-        //var countryDropdown = document.getElementById('CountryId');
-
-        //if (countryDropdown) {
-        //    countryDropdown.addEventListener('change', function () {
-
-        //        var countryId = this.value;
-        //        var stateDropdown = document.getElementById('StateId');
-
-        //        if (!stateDropdown) return;
-
-        //        stateDropdown.innerHTML = '<option>Loading...</option>';
-        //        stateDropdown.disabled = true;
-
-        //        if (!countryId) {
-        //            stateDropdown.innerHTML = '<option value="">-- Select State --</option>';
-        //            stateDropdown.disabled = false;
-        //            return;
-        //        }
-
-        //        fetch('/Admin/City/GetStatesByCountry?countryId=' + countryId)
-        //            .then(res => res.json())
-        //            .then(data => {
-
-        //                var options = '<option value="">-- Select State --</option>';
-
-        //                data.forEach(function (state) {
-        //                    options += `<option value="${state.stateId}">${state.stateName}</option>`;
-        //                });
-
-        //                stateDropdown.innerHTML = options;
-        //                stateDropdown.disabled = false;
-        //            })
-        //            .catch(() => {
-        //                alert('Error loading states');
-        //            });
-        //    });
-        //}
         var countryDropdown = document.getElementById('CountryId');
         var stateDropdown = document.getElementById('StateId');
 
@@ -123,40 +85,7 @@
             });
         }
 
-        // ================== EDIT MODE FIX (AUTO SELECT COUNTRY + STATE) ==================
-        // 🔥 This runs ONLY when editing existing city
-
-        //if (typeof selectedCountryId !== 'undefined' && selectedCountryId) {
-
-        //    var countryDropdown = document.getElementById('CountryId');
-        //    var stateDropdown = document.getElementById('StateId');
-
-        //    // Set selected country
-        //    if (countryDropdown) {
-        //        countryDropdown.value = selectedCountryId;
-        //    }
-
-        //    // Load states for that country
-        //    fetch('/Admin/City/GetStatesByCountry?countryId=' + selectedCountryId)
-        //        .then(res => res.json())
-        //        .then(data => {
-
-        //            var options = '<option value="">-- Select State --</option>';
-
-        //            data.forEach(function (state) {
-
-        //                // 🔥 Select correct state
-        //                if (state.stateId == selectedStateId) {
-        //                    options += `<option value="${state.stateId}" selected>${state.stateName}</option>`;
-        //                } else {
-        //                    options += `<option value="${state.stateId}">${state.stateName}</option>`;
-        //                }
-        //            });
-
-        //            stateDropdown.innerHTML = options;
-        //            stateDropdown.disabled = false;
-        //        });
-        //}
+       
         if (typeof selectedCountryId !== 'undefined' && selectedCountryId) {
 
             if (countryDropdown) {

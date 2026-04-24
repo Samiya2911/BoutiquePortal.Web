@@ -4,7 +4,7 @@
     Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
     ViewBag.Title = "Dashboard";
 
-    // ✅ Serialize chart data safely for JS
+    //  Serialize chart data safely for JS
     var monthLabels = JsonSerializer.Serialize(
         Model.MonthlyRevenue.Select(m => m.MonthName).ToList());
     var monthRevenue = JsonSerializer.Serialize(

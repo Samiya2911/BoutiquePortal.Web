@@ -140,5 +140,24 @@ namespace BoutiquePortal.Repositories.Repository
                 new { CustomerId = customerId },
                 commandType: CommandType.StoredProcedure);
         }
+
+
+        public async Task<int> DecreaseProductQuantityAsync(int orderId)
+        {
+            using var conn = new SqlConnection(_conn);
+            return await conn.ExecuteScalarAsync<int>(
+                "sp_Product_DecreaseQuantity",
+                new { OrderId = orderId },
+                commandType: CommandType.StoredProcedure);
+        }
+
+        public async Task<int> UpdateStockStatusAsync()
+        {
+            using var conn = new SqlConnection(_conn);
+            return await conn.ExecuteScalarAsync<int>(
+                "sp_Product_UpdateStockStatus",
+                commandType: CommandType.StoredProcedure);
+        }
+
     }
 }

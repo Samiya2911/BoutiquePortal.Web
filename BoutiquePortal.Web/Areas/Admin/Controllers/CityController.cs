@@ -1,11 +1,13 @@
 ﻿using BoutiquePortal.Model.Models;
 using BoutiquePortal.Services.Interfaces;
-using Microsoft.AspNetCore.Mvc;
+using BoutiquePortal.Web.Filters;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc;
 
 namespace BoutiquePortal.Web.Areas.Admin.Controllers
 {
     [Area("Admin")]
+    [AdminAuthFilter]
     public class CityController : Controller
     {
         private readonly ICityService _service;

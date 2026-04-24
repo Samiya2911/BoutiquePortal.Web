@@ -36,8 +36,7 @@
 
         if (statusForm) {
             statusForm.addEventListener('submit', function (e) {
-                // Let it submit normally (redirect back)
-                // badge color updates on page reload via server
+                
             });
         }
 

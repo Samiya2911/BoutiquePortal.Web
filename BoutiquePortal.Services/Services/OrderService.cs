@@ -41,6 +41,12 @@ namespace BoutiquePortal.Services.Services
             => _repo.GetEarningsAsync(vendorId);
 
         public Task<IEnumerable<Order>> GetByCustomerAsync(int customerId)
-    => _repo.GetByCustomerAsync(customerId);
+            => _repo.GetByCustomerAsync(customerId);
+
+        public Task<int> DecreaseProductQuantityAsync(int orderId)
+            => _repo.DecreaseProductQuantityAsync(orderId);
+
+        public Task<int> UpdateStockStatusAsync()
+           => _repo.UpdateStockStatusAsync();
     }
 }

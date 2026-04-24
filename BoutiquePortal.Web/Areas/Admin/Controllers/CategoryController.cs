@@ -1,11 +1,13 @@
 ﻿using BoutiquePortal.Model.Models;
 using BoutiquePortal.Services.Interfaces;
-using Microsoft.AspNetCore.Mvc;
+using BoutiquePortal.Web.Filters;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc;
 
 namespace BoutiquePortal.Web.Areas.Admin.Controllers
 {
     [Area("Admin")]
+    [AdminAuthFilter]
     public class CategoryController : Controller
     {
         private readonly ICategoryService _service;
@@ -40,9 +42,7 @@ namespace BoutiquePortal.Web.Areas.Admin.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> AddEdit(Category model)
-        {
-            // Read ALL values directly from Request.Form
-            // This bypasses ModelState binding issues completely
+        {       
             model.CategoryName = Request.Form["CategoryName"].ToString().Trim();
             model.Description = Request.Form["Description"].ToString();
             model.CategoryImage = Request.Form["CategoryImage"].ToString();

@@ -16,8 +16,5 @@ namespace BoutiquePortal.Services.Interfaces
         Task<int> RemoveItemAsync(int customerId, int productId);
         Task<int> ClearCartAsync(int customerId);
         Task<List<CartItem>> GetCartItemsForSessionAsync(int customerId);
-
-        // Task SyncSessionToDbAsync(int customerId, ISession session);
-        //Task LoadDbToSessionAsync(int customerId, ISession session);
     }
 }

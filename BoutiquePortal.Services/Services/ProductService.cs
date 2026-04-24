@@ -42,7 +42,5 @@ namespace BoutiquePortal.Services.Services
 
         public Task<Product?> GetDetailAsync(int productId)
             => _repo.GetDetailAsync(productId);
-
-
     }
 }

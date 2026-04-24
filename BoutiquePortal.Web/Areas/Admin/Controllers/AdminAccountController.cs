@@ -14,26 +14,6 @@ namespace BoutiquePortal.Web.Areas.Admin.Controllers
         }
         public IActionResult Login() => View();
 
-        //[HttpPost]
-        //[ValidateAntiForgeryToken]
-        //public async Task<IActionResult> Login(AdminLoginVM model)
-        //{
-        //    if (!ModelState.IsValid) return View(model);
-
-        //    var admin = await _authService.ValidateAdminAsync(model.Email, model.Password);
-        //    if (admin == null)
-        //    {
-        //        ModelState.AddModelError("", "Invalid email or password.");
-        //        return View(model);
-        //    }
-
-        //    HttpContext.Session.SetString("Role", "Admin");
-        //    HttpContext.Session.SetString("AdminName", admin.AdminName);
-        //    HttpContext.Session.SetInt32("AdminId", admin.AdminId);
-
-        //    return RedirectToAction("Index", "Dashboard", new { area = "Admin" });
-        //}
-
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Login(AdminLoginVM model)
@@ -70,7 +50,8 @@ namespace BoutiquePortal.Web.Areas.Admin.Controllers
         public IActionResult Logout()
         {
             HttpContext.Session.Clear();
-            return RedirectToAction("Login", "AdminAccount", new { area = "Admin" });
+            //return RedirectToAction("Login", "AdminAccount", new { area = "Admin" });
+            return Redirect("/Home/Index");
         }
     }
 }

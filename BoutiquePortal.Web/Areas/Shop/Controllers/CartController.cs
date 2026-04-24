@@ -27,31 +27,26 @@ namespace BoutiquePortal.Web.Areas.Shop.Controllers
         }
 
         // ======= ADD TO CART =======
+
         public async Task<IActionResult> Add(int id, int qty = 1)
         {
-            // Must be logged in as Customer
             if (HttpContext.Session.GetString("Role") != "Customer")
             {
                 TempData["CartMsg"] = "Please login to add items to cart.";
-                return RedirectToAction("Login", "CustomerAccount",
+                return RedirectToAction("Login", "Account",
                     new { area = "Customer" });
             }
 
             var product = await _productService.GetDetailAsync(id);
-
-            if (product == null)
+            if (product == null || product.Quantity <= 0)
             {
-                TempData["CartMsg"] = "Product not found.";
+                TempData["CartMsg"] = product == null
+                    ? "Product not found."
+                    : "Sorry, this product is out of stock.";
                 return RedirectToAction("Index", "Shop", new { area = "Shop" });
             }
 
-            if (product.Quantity <= 0)
-            {
-                TempData["CartMsg"] = "Sorry, this product is out of stock.";
-                return RedirectToAction("Details", "Product",
-                    new { area = "Shop", id });
-            }
-
+            // ✅ Step 1: Add to session
             var cartItem = new CartItem
             {
                 ProductId = product.ProductId,
@@ -63,47 +58,37 @@ namespace BoutiquePortal.Web.Areas.Shop.Controllers
                 Quantity = qty,
                 VendorId = product.VendorId
             };
-
             CartHelper.AddItem(HttpContext.Session, cartItem);
 
+            // ✅ Step 2: Sync ENTIRE session cart to DB
+            //           (replaces DB with exact session quantities)
             int customerId = HttpContext.Session.GetInt32("CustomerId") ?? 0;
             if (customerId > 0)
             {
-                await _cartService.AddToCartAsync(
-                    customerId, product.ProductId, qty);
+                await SyncCartToDbAsync(customerId);
             }
 
             TempData["CartMsg"] = $"'{product.ProductName}' added to cart!";
             return RedirectToAction(nameof(Index));
         }
 
-        // ======= UPDATE QUANTITY (AJAX) =======
-        //[HttpPost]
-        //[IgnoreAntiforgeryToken]
-        //public IActionResult UpdateQty(int productId, int quantity)
-        //{
-        //    CartHelper.UpdateQuantity(HttpContext.Session, productId, quantity);
+        // ✅ Helper: sync whole session cart to DB cleanly
+        private async Task SyncCartToDbAsync(int customerId)
+        {
+            var sessionCart = CartHelper.GetCart(HttpContext.Session);
 
-        //    int customerId = HttpContext.Session.GetInt32("CustomerId") ?? 0;
-        //    if (customerId > 0)
-        //    {
-        //        await _cartService.UpdateQuantityAsync(
-        //            customerId, productId, quantity);
-        //    }
+            // Clear DB cart first
+            await _cartService.ClearCartAsync(customerId);
 
+            // Rewrite from session
+            foreach (var item in sessionCart)
+            {
+                await _cartService.AddToCartAsync(
+                    customerId, item.ProductId, item.Quantity);
+            }
+        }
 
-        //    var cart = CartHelper.GetCart(HttpContext.Session);
-        //    var item = cart.FirstOrDefault(c => c.ProductId == productId);
-        //    var total = CartHelper.GetCartTotal(HttpContext.Session);
-
-        //    return Json(new
-        //    {
-        //        success = true,
-        //        subTotal = item?.SubTotal.ToString("N2") ?? "0.00",
-        //        cartTotal = total.ToString("N2"),
-        //        cartCount = CartHelper.GetCartCount(HttpContext.Session)
-        //    });
-        //}
+        // ======= UPDATE QUANTITY (AJAX) ======
 
         [HttpPost]
         [IgnoreAntiforgeryToken]
@@ -114,7 +99,8 @@ namespace BoutiquePortal.Web.Areas.Shop.Controllers
             int customerId = HttpContext.Session.GetInt32("CustomerId") ?? 0;
             if (customerId > 0)
             {
-                await _cartService.UpdateQuantityAsync(customerId, productId, quantity);
+                await SyncCartToDbAsync(customerId);
+                // await _cartService.UpdateQuantityAsync(customerId, productId, quantity);
             }
 
             var cart = CartHelper.GetCart(HttpContext.Session);
@@ -124,9 +110,12 @@ namespace BoutiquePortal.Web.Areas.Shop.Controllers
             return Json(new
             {
                 success = true,
-                subTotal = item?.SubTotal.ToString("N2") ?? "0.00",
-                cartTotal = total.ToString("N2"),
+                cartTotal = CartHelper.GetCartTotal(HttpContext.Session).ToString("N2"),
                 cartCount = CartHelper.GetCartCount(HttpContext.Session)
+                //success = true,
+                //subTotal = item?.SubTotal.ToString("N2") ?? "0.00",
+                //cartTotal = total.ToString("N2"),
+                //cartCount = CartHelper.GetCartCount(HttpContext.Session)
             });
         }
 
@@ -156,41 +145,14 @@ namespace BoutiquePortal.Web.Areas.Shop.Controllers
             });
         }
 
-        //[HttpPost]
-        //[IgnoreAntiforgeryToken]
-        //public IActionResult Remove(int productId)
-        //{
-        //    CartHelper.RemoveItem(HttpContext.Session, productId);
-
-        //    int customerId = HttpContext.Session.GetInt32("CustomerId") ?? 0;
-        //    if (customerId > 0)
-        //    {
-        //        await _cartService.RemoveItemAsync(customerId, productId);
-        //    }
-
-        //    var total = CartHelper.GetCartTotal(HttpContext.Session);
-        //    var count = CartHelper.GetCartCount(HttpContext.Session);
-
-        //    return Json(new
-        //    {
-        //        success = true,
-        //        cartTotal = total.ToString("N2"),
-        //        cartCount = count
-        //    });
-        //}
-
         // ======= CLEAR CART =======
-        //public IActionResult Clear()    
-        //{
-        //    CartHelper.ClearCart(HttpContext.Session);
-        //    return RedirectToAction(nameof(Index));
-        //}
+        
         public async Task<IActionResult> Clear()
         {
-            // ✅ Clear Session
+            //  Clear Session
             CartHelper.ClearCart(HttpContext.Session);
 
-            // ✅ Clear DB if logged in
+            // Clear DB if logged in
             int customerId = HttpContext.Session.GetInt32("CustomerId") ?? 0;
             if (customerId > 0)
             {

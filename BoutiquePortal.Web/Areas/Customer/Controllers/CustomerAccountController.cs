@@ -7,19 +7,15 @@ using CustomerModel = BoutiquePortal.Model.Models.Customer;
 
 namespace BoutiquePortal.Web.Areas.Customer.Controllers
 {
-    
+
     [Area("Customer")]
     public class CustomerAccountController : Controller
     {
         private readonly ICustomerService _customerService;
         private readonly ICartService _cartService;
-       
-        //public CustomerAccountController(ICustomerService customerService)
-        //    => _customerService = customerService;
-
         public CustomerAccountController(
            ICustomerService customerService,
-           ICartService cartService)              
+           ICartService cartService)
         {
             _customerService = customerService;
             _cartService = cartService;
@@ -58,37 +54,12 @@ namespace BoutiquePortal.Web.Areas.Customer.Controllers
                 CartHelper.SaveCart(HttpContext.Session, dbCartItems);
 
 
-              //  CartHelper.SaveCart(HttpContext.Session, dbCartItems);
+            //  CartHelper.SaveCart(HttpContext.Session, dbCartItems);
 
             return RedirectToAction("Index", "Home", new { area = "Shop" });
         }
 
-        //[HttpPost]
-        //[ValidateAntiForgeryToken]
-        //public async Task<IActionResult> Login(CustomerLoginVM model)
-        //{
-        //    if (!ModelState.IsValid) return View(model);
 
-        //    (bool success, string message, CustomerModel? customer) =
-        //        await _customerService.LoginAsync(model.Email, model.Password);
-
-        //    if (!success)
-        //    {
-        //        ModelState.AddModelError("", message);
-        //        return View(model);
-        //    }
-
-        //    HttpContext.Session.SetString("Role", "Customer");
-        //    HttpContext.Session.SetString("CustomerName", customer!.FullName);
-        //    HttpContext.Session.SetString("CustomerEmail", customer.Email);
-        //    HttpContext.Session.SetInt32("CustomerId", customer.CustomerId);
-
-        //    await _cartService.LoadDbToSessionAsync(
-        //       customer.CustomerId, HttpContext.Session);
-
-        //    return RedirectToAction("Index", "Home", new { area = "Shop" });
-        //    // return RedirectToAction("Index", "Dashboard", new { area = "Customer" });
-        //}
 
         // ======= REGISTER GET =======
         public IActionResult Register() => View();
@@ -123,14 +94,7 @@ namespace BoutiquePortal.Web.Areas.Customer.Controllers
         }
 
         // ======= LOGOUT =======
-        //public IActionResult Logout()
-        //{
-        //    HttpContext.Session.Clear();
-        //    return RedirectToAction("Login", "CustomerAccount", new { area = "Customer" })
 
-        //}
-
-        //  Add async to Logout
         public async Task<IActionResult> Logout()
         {
             var role = HttpContext.Session.GetString("Role");
@@ -141,6 +105,8 @@ namespace BoutiquePortal.Web.Areas.Customer.Controllers
                 //  Sync session cart to DB before clearing
                 var sessionCart = CartHelper.GetCart(HttpContext.Session);
 
+                await _cartService.ClearCartAsync(customerId);
+
                 foreach (var item in sessionCart)
                 {
                     await _cartService.AddToCartAsync(
@@ -149,10 +115,8 @@ namespace BoutiquePortal.Web.Areas.Customer.Controllers
             }
 
             HttpContext.Session.Clear();
-            return RedirectToAction("Login", "CustomerAccount",
-                new { area = "Customer" });
+            return Redirect("/Home/Index");
+            //  return RedirectToAction("Login", "CustomerAccount",new { area = "Customer" });
         }
-
-
     }
 }

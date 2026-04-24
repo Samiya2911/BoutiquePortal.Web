@@ -80,7 +80,7 @@
                     return;
                 }
 
-                // ✅ Vendor area AJAX endpoint
+                //  Vendor area AJAX endpoint
                 fetch('/Vendor/Product/GetSubCategoriesByCategory?categoryId=' + categoryId)
                     .then(res => res.json())
                     .then(data => {

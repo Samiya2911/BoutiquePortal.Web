@@ -1,10 +1,12 @@
 ﻿using BoutiquePortal.Model.Models;
 using BoutiquePortal.Services.Interfaces;
+using BoutiquePortal.Web.Filters;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BoutiquePortal.Web.Areas.Admin.Controllers
 {
     [Area("Admin")]
+    [AdminAuthFilter]
     public class StateController : Controller
     {
         private readonly IStateService _service;

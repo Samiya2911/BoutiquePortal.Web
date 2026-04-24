@@ -1,11 +1,13 @@
 ﻿using BoutiquePortal.Model.Models;
 using BoutiquePortal.Services.Interfaces;
-using Microsoft.AspNetCore.Mvc;
+using BoutiquePortal.Web.Filters;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc;
 
 namespace BoutiquePortal.Web.Areas.Admin.Controllers
 {
     [Area("Admin")]
+    [AdminAuthFilter]
     public class SubCategoryController : Controller
     {
         private readonly ISubCategoryService _service;
@@ -49,7 +51,7 @@ namespace BoutiquePortal.Web.Areas.Admin.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> AddEdit(SubCategory model)
         {
-            // ✅ MANUAL BINDING
+            //  MANUAL BINDING
             model.SubCategoryName = Request.Form["SubCategoryName"].ToString().Trim();
             model.Description = Request.Form["Description"].ToString();
             model.SubCategoryImage = Request.Form["SubCategoryImage"].ToString();
@@ -92,7 +94,7 @@ namespace BoutiquePortal.Web.Areas.Admin.Controllers
                     await model.ImageFile.CopyToAsync(stream);
                 }
 
-                // ✅ SAVE ONLY IMAGE NAME
+                //  SAVE ONLY IMAGE NAME
                 model.SubCategoryImage = fileName;
             }
 

@@ -67,34 +67,16 @@ namespace BoutiquePortal.Services.Services
         }
 
         // ======= UPDATE PASSWORD =======
-        //public async Task<(bool success, string message)> UpdatePasswordAsync(
-        //    int customerId, string currentPassword, string newPassword)
-        //{
-        //    var customer = await _repo.GetByIdAsync(customerId);
-
-        //    if (customer == null)
-        //        return (false, "Customer not found.");
-
-        //    //if (customer.Password != currentPassword)
-        //    //    return (false, "Current password is incorrect.");
-
-        //    if (customer.Password?.Trim() != currentPassword?.Trim())
-        //        return (false, "Current password is incorrect.");
-
-        //    await _repo.UpdatePasswordAsync(customerId, newPassword);
-        //    return (true, "Password updated successfully!");
-        //}
-
         public async Task<(bool success, string message)> UpdatePasswordAsync(
                int customerId, string currentPassword, string newPassword)
         {
-            // ✅ Use dedicated method that returns password
+            //  Use dedicated method that returns password
             var customer = await _repo.GetByIdWithPasswordAsync(customerId);
 
             if (customer == null)
                 return (false, "Customer not found.");
 
-            // ✅ Trim to avoid any whitespace issues
+            //  Trim to avoid any whitespace issues
             string storedPassword = customer.Password?.Trim() ?? string.Empty;
             string enteredPassword = currentPassword?.Trim() ?? string.Empty;
 

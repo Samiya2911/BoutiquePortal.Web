@@ -61,7 +61,7 @@
                 </div>
 
                 <!-- Stock -->
-                <p style="margin-bottom:15px;">
+               @*  <p style="margin-bottom:15px;">
                     @if (Model.Quantity > 0)
                     {
                         <span style="color:green;">
@@ -72,7 +72,25 @@
                     {
                         <span style="color:red;">❌ Out of Stock</span>
                     }
-                </p>
+                </p> *@
+
+                <div style="margin: 15px 0;">
+                    @if (Model.Quantity > 0)
+                    {
+                        <span style="color: green; font-weight: 600;">
+                            ✅ In Stock
+                            <span style="color: #888; font-weight: 400; font-size: 13px;">
+                                (@Model.Quantity available)
+                            </span>
+                        </span>
+                    }
+                    else
+                    {
+                        <span style="color: red; font-weight: 600;">
+                            ❌ Out of Stock
+                        </span>
+                    }
+                </div>
 
                 <!-- Description -->
                 @if (!string.IsNullOrEmpty(Model.Description))
@@ -90,30 +108,36 @@
 
                 <hr />
 
-                <!-- Buy Button -->
-                <!-- Replace the buy button section with this -->
+                <!-- ======= BUY BUTTON ======= -->
                 @if (Model.Quantity > 0)
                 {
                     @if (Context.Session.GetString("Role") == "Customer")
                     {
-                        <!-- Quantity selector -->
-                        <div style="display:flex; align-items:center; gap:10px; margin-bottom:15px;">
+                        <div style="display:flex; align-items:center;
+                            gap:10px; margin-bottom:15px;">
                             <label style="font-weight:600;">Qty:</label>
                             <button onclick="changeQty(-1)"
-                                    style="width:32px; height:32px; border:1px solid #ddd;
-                                   background:#f5f5f5; cursor:pointer; border-radius:4px;
-                                   font-size:16px;">
+                                    style="width:32px; height:32px;
+                                   border:1px solid #ddd;
+                                   background:#f5f5f5;
+                                   cursor:pointer; border-radius:4px;">
                                 −
                             </button>
                             <span id="qty-display"
-                                  style="font-size:18px; font-weight:bold; min-width:30px;
-                                 text-align:center;">1</span>
+                                  style="font-size:18px; font-weight:bold;
+                                 min-width:30px; text-align:center;">
+                                1
+                            </span>
                             <button onclick="changeQty(1)"
-                                    style="width:32px; height:32px; border:1px solid #ddd;
-                                   background:#f5f5f5; cursor:pointer; border-radius:4px;
-                                   font-size:16px;">
+                                    style="width:32px; height:32px;
+                                   border:1px solid #ddd;
+                                   background:#f5f5f5;
+                                   cursor:pointer; border-radius:4px;">
                                 +
                             </button>
+                            <span style="color:#888; font-size:12px;">
+                                Max: @Model.Quantity
+                            </span>
                         </div>
 
                         <a id="add-to-cart-btn"
@@ -126,20 +150,32 @@
                     else
                     {
                         <a href="/Customer/CustomerAccount/Login"
-                           class="btn btn-primary btn-lg"
-                           style="margin-right:10px;">
+                           class="btn btn-primary btn-lg">
                             Login to Buy
                         </a>
                     }
+                }
+                else
+                {
+                    <!-- ✅ Out of Stock button -->
+                    <button class="btn btn-secondary btn-lg" disabled
+                            style="cursor: not-allowed;">
+                        ❌ Out of Stock
+                    </button>
+                    <p style="color:#e74c3c; font-size:13px; margin-top:8px;">
+                        This product is currently unavailable.
+                        Check back later!
+                    </p>
                 }
 
                 <a href="/Shop/Shop" class="btn btn-outline-secondary btn-lg">
                     ← Back to Shop
                 </a>
 
+               
                 @section Scripts {
                     <script>
-                        var qty = 1;
+                        var qty    = 1;
                         var maxQty = @Model.Quantity;
 
                         function changeQty(delta) {
@@ -150,39 +186,6 @@
                         }
                     </script>
                 }
-
-
-              @*   @if (Model.Quantity > 0)
-                {
-                    @if (Context.Session.GetString("Role") == "Customer")
-                    {
-                        <a href="/Shop/Cart/Add/@Model.ProductId"
-                           class="btn btn-primary btn-lg"
-                           style="margin-right:10px;">
-                            🛒 Add to Cart
-                        </a>
-                    }
-                    else
-                    {
-                        <a href="/Customer/CustomerAccount/Login"
-                           class="btn btn-primary btn-lg"
-                           style="margin-right:10px;">
-                            Login to Buy
-                        </a>
-                    }
-                }
-                else
-                {
-                    <button class="btn btn-secondary btn-lg" disabled>
-                        Out of Stock
-                    </button>
-                }
-
-                <a href="/Shop/Shop"
-                   class="btn btn-outline-secondary btn-lg">
-                    ← Back to Shop
-                </a> *@
-
             </div>
 
         </div>

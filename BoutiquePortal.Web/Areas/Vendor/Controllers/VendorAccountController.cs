@@ -107,19 +107,11 @@ namespace BoutiquePortal.Web.Areas.Vendor.Controllers
         public async Task<JsonResult> GetCitiesByState(int stateId)
             => Json(await _cityService.GetByStateId(stateId));
 
-
-        //public IActionResult Logout()
-        //{
-        //    HttpContext.Session.Clear();
-        //    return RedirectToAction("Login");
-        //}
-
         public IActionResult Logout()
         {
             HttpContext.Session.Clear();
-            return RedirectToAction("Login", "VendorAccount", new { area = "Vendor" });
+            return Redirect("/Home/Index");
+            //return RedirectToAction("Login", "VendorAccount", new { area = "Vendor" });
         }
-
-
     }
 }
