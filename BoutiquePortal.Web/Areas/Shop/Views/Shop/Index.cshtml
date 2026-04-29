@@ -10,51 +10,45 @@
         <!-- ======= LEFT SIDEBAR ======= -->
         <div class="col-md-3 product-price">
             <div class="rsidebar span_1_of_left">
+
+                <!-- CATEGORIES -->
                 <div class="of-left">
                     <h3 class="cate">Categories</h3>
                 </div>
 
-                <ul class="menu">
+                <ul class="menu" id="category-menu">
+
+                    <!-- All Products -->
                     <li class="@(ViewBag.SelectedCategory == null ? "item1" : "")">
-                        <a href="/Shop/Shop">All Products</a>
+                        <a href="/Shop/Shop"
+                           style="@(ViewBag.SelectedCategory == null
+                                                          ? "color:#e74c3c; font-weight:bold;"
+                                                          : "")">
+                            All Products
+                        </a>
                     </li>
+
                     @if (ViewBag.Categories != null)
                     {
                         int idx = 1;
                         foreach (var cat in ViewBag.Categories)
                         {
+                            bool isSelected = ViewBag.SelectedCategory != null
+                            && ViewBag.SelectedCategory == cat.CategoryId;
                             <li class="item@(idx++)">
+                                <!-- ✅ Direct href — no JS interference -->
                                 <a href="/Shop/Shop?categoryId=@cat.CategoryId"
-                                   class="@(ViewBag.SelectedCategory == cat.CategoryId ? "active" : "")">
-                                    @cat.CategoryName
-                                </a>
-                            </li>
-                        }
+                                   style="@(isSelected
+                                                                          ? "color:#e74c3c; font-weight:bold;"
+                                                                          : "")">
+                            @cat.CategoryName
+                        </a>
+                    </li>
+                                        }
                     }
                 </ul>
 
-                <!-- Accordion JS -->
-                <script type="text/javascript">
-                    $(function () {
-                        var menu_ul = $('.menu > li > ul'),
-                            menu_a  = $('.menu > li > a');
-                        menu_ul.hide();
-                        menu_a.click(function (e) {
-                            e.preventDefault();
-                            if (!$(this).hasClass('active')) {
-                                menu_a.removeClass('active');
-                                menu_ul.filter(':visible').slideUp('normal');
-                                $(this).addClass('active').next()
-                                       .stop(true, true).slideDown('normal');
-                            } else {
-                                $(this).removeClass('active');
-                                $(this).next().stop(true, true).slideUp('normal');
-                            }
-                        });
-                    });
-                </script>
-
-                <!-- Search Box -->
+                <!-- SEARCH -->
                 <div class="product-middle">
                     <div class="fit-top">
                         <h6 class="shop-top">Search Products</h6>
@@ -62,28 +56,71 @@
                     </div>
                 </div>
 
+                <!-- FILTER -->
                 <div class="sellers">
                     <div class="of-left-in">
                         <h3 class="tag">Filter</h3>
                     </div>
                     <div class="tags">
-                        <form action="/Shop/Shop" method="get">
-                            <input type="text" name="q"
+                        <form action="/Shop/Shop" method="get"
+                              id="SearchForm">
+                            <input type="text"
+                                   name="q"
+                                   id="search-input"
                                    value="@ViewBag.SearchQuery"
-                                   class="form-control"
-                                   placeholder="Search..." />
+                                   placeholder="Search..."
+                                   style="width:100%; padding:8px 10px;
+                                          border:1px solid #ddd;
+                                          border-radius:4px;
+                                          font-size:13px;
+                                          margin-bottom:8px;" />
+
                             @if (ViewBag.SelectedCategory != null)
                             {
-                                <input type="hidden" name="categoryId"
+                                <input type="hidden"
+                                       name="categoryId"
                                        value="@ViewBag.SelectedCategory" />
                             }
+
                             <button type="submit"
-                                    class="btn btn-sm btn-primary mt-2 w-100">
-                                Search
+                                    style="width:100%; background:#e74c3c;
+                                           color:white; border:none;
+                                           padding:9px; border-radius:4px;
+                                           cursor:pointer; font-size:13px;
+                                           font-weight:600;">
+                                🔍 Search
                             </button>
                         </form>
                     </div>
                 </div>
+
+                <!-- ACTIVE FILTER INFO -->
+                @if (ViewBag.SelectedCategory != null ||
+                                !string.IsNullOrEmpty(ViewBag.SearchQuery as string))
+                {
+                    <div style="margin-top:15px; padding:10px;
+                                    background:#fff3cd; border-radius:6px;
+                                    font-size:12px; color:#856404;">
+                        <strong>Active Filter:</strong><br />
+                        @if (ViewBag.SelectedCategory != null)
+                        {
+                            <span>📁 Category selected</span>
+                    
+                            <br />
+                        }
+                        @if (!string.IsNullOrEmpty(ViewBag.SearchQuery as string))
+                        {
+                            <span>🔍 "@ViewBag.SearchQuery"</span>
+                    
+                            <br />
+                        }
+                        <a href="/Shop/Shop"
+                           style="color:#e74c3c; text-decoration:none;
+                                      font-weight:600;">
+                            ✕ Clear Filter
+                        </a>
+                    </div>
+                }
 
             </div>
         </div>
@@ -91,11 +128,39 @@
         <!-- ======= RIGHT PRODUCT GRID ======= -->
         <div class="col-md-9 product1">
 
+            <!-- Product Count -->
+            @if (Model.Any())
+            {
+                <p style="color:#888; font-size:13px;
+                               margin-bottom:15px; padding-top:5px;">
+                    Showing <strong>@Model.Count()</strong>
+                    product@(Model.Count() != 1 ? "s" : "")
+                    @if (ViewBag.SelectedCategory != null)
+                    {
+                        <span>in selected category</span>
+                    }
+                    @if (!string.IsNullOrEmpty(ViewBag.SearchQuery as string))
+                    {
+                        <span>for "@ViewBag.SearchQuery"</span>
+                    }
+                </p>
+            }
+
             @if (!Model.Any())
             {
-                <div class="alert alert-info mt-3">
-                    No products found.
-                    <a href="/Shop/Shop">View all products</a>
+                <div style="text-align:center; padding:60px 20px;">
+                    <div style="font-size:3rem; margin-bottom:15px;">🔍</div>
+                    <h4 style="color:#999;">No products found</h4>
+                    <p style="color:#bbb;">
+                        Try a different search or browse all products.
+                    </p>
+                    <a href="/Shop/Shop"
+                       style="display:inline-block; background:#e74c3c;
+                                  color:white; padding:10px 25px;
+                                  border-radius:6px; text-decoration:none;
+                                  font-weight:600; margin-top:10px;">
+                        View All Products
+                    </a>
                 </div>
             }
             else
@@ -109,60 +174,10 @@
                     }
                     i++;
 
-                    @* <div class="col-md-4 bottom-cd simpleCart_shelfItem">
-                        <div class="product-at">
-                            <a href="/Shop/Product/Details/@item.ProductId">
-                                @if (!string.IsNullOrEmpty(item.ProductImage))
-                                {
-                                    <img class="img-responsive"
-                                         src="~/images/product/@item.ProductImage"
-                                         alt="@item.ProductName"
-                                         style="height:220px; object-fit:cover;"                                        
-                                         onerror="this.src='/shop/images/pi.jpg'" />
-                                }
-                                else
-                                {
-                                    <img class="img-responsive"
-                                         src="~/shop/images/pi.jpg"
-                                         alt="@item.ProductName"
-                                         style="height:220px; object-fit:cover;" />
-                                }
-                                <div class="pro-grid">
-                                    <span class="buy-in">View Details</span>
-                                </div>
-                            </a>
-                        </div>
-
-                        <p class="tun">@item.ProductName</p>
-                        <p style="font-size:12px; color:#888;">@item.BrandName</p>
-
-                        <p class="number item_price">
-                            @if (item.DiscountPrice.HasValue && item.DiscountPrice > 0)
-                            {
-                                <span style="text-decoration:line-through; color:#999; font-size:13px;">
-                                    &#8377;@item.Price.ToString("0.00")
-                                </span>
-                                <span style="color:#e74c3c; font-weight:bold;">
-                                    &#8377;@item.DiscountPrice.Value.ToString("0.00")
-                                </span>
-                            }
-                            else
-                            {
-                                <span style="color:#333; font-weight:bold;">
-                                    &#8377;@item.Price.ToString("0.00")
-                                </span>
-                            }
-                        </p>
-
-                        <a href="/Shop/Product/Details/@item.ProductId"
-                           class="btn btn-sm btn-primary mb-3">
-                            View Details
-                        </a>
-                    </div> *@
-
-                    <!-- Inside your product card foreach loop -->
                     <div class="col-md-4 bottom-cd simpleCart_shelfItem">
-                        <div class="product-at">
+                        <div class="product-at"
+                             style="position:relative;">
+
                             <a href="/Shop/Product/Details/@item.ProductId">
                                 @if (!string.IsNullOrEmpty(item.ProductImage))
                                 {
@@ -170,57 +185,80 @@
                                          src="~/images/product/@item.ProductImage"
                                          alt="@item.ProductName"
                                          style="height:220px; object-fit:cover;
-                                        @(item.Quantity == 0 ? "filter:grayscale(100%); opacity:0.6;" : "")"
-                                         onerror="this.src='/shop/images/pi.jpg'" />
-                                }
+                                                            @(item.Quantity == 0
+                                                                                             ? "filter:grayscale(80%); opacity:0.6;"
+                                                                                             : "")"
+                             onerror="this.src='/shop/images/pi.jpg'" />
+                                                }
                                 else
                                 {
                                     <img class="img-responsive"
                                          src="~/shop/images/pi.jpg"
-                                         style="height:220px; object-fit:cover;" />
-                                }
+                                         alt="@item.ProductName"
+                                         style="height:220px; object-fit:cover;
+                                                            @(item.Quantity == 0
+                                                                                             ? "filter:grayscale(80%); opacity:0.6;"
+                                                                                             : "")" />
+                                                }
 
-                                <!-- ✅ Out of Stock overlay badge -->
+                                @* Out of Stock Badge *@
                                 @if (item.Quantity == 0)
                                 {
-                                    <div style="position:absolute; top:10px; right:10px;
-                                        background:#e74c3c; color:white;
-                                        padding:4px 10px; border-radius:4px;
-                                        font-size:12px; font-weight:bold;">
+                                    <div style="position:absolute; top:10px;
+                                                            right:10px; background:#e74c3c;
+                                                            color:white; padding:4px 10px;
+                                                            border-radius:4px; font-size:11px;
+                                                            font-weight:bold; z-index:1;">
                                         Out of Stock
                                     </div>
                                 }
 
-                                <div class="pro-grid">
-                                    <span class="buy-in">
-                                        @(item.Quantity > 0 ? "View Details" : "Out of Stock")
-                                    </span>
-                                </div>
-                            </a>
+                        <div class="pro-grid">
+                            <span class="buy-in">
+                                @(item.Quantity > 0
+                                                                ? "View Details"
+                                                                : "Out of Stock")
+                            </span>
                         </div>
+                    </a>
+                </div>
 
-                        <p class="tun">@item.ProductName</p>
-                        <p style="font-size:12px; color:#888;">@item.BrandName</p>
+                        <!-- Product Name -->
+                        <p class="tun">
+                            <a href="/Shop/Product/Details/@item.ProductId"
+                               style="color:inherit; text-decoration:none;">
+                                @item.ProductName
+                            </a>
+                        </p>
 
+                        <!-- Brand -->
+                        <p style="font-size:12px; color:#888;
+                                          margin-bottom:5px;">
+                            @item.BrandName
+                        </p>
+
+                        <!-- Price -->
                         <p class="number item_price">
-                            @if (item.DiscountPrice.HasValue && item.DiscountPrice > 0)
+                    @if (item.DiscountPrice.HasValue && item.DiscountPrice > 0)
                             {
                                 <span style="text-decoration:line-through;
-                                     color:#999; font-size:13px;">
-                                    &#8377;@item.Price.ToString("0.00")
+                                 color:#999; font-size:13px;">
+                                    &#8377;@(item.Price.ToString("0.00"))
                                 </span>
-                                <span style="color:#e74c3c; font-weight:bold;">
-                                    &#8377;@item.DiscountPrice.Value.ToString("0.00")
+                                <span style="color:#e74c3c; font-weight:bold;
+                                 margin-left:5px;">
+                                    &#8377;@(item.DiscountPrice.Value.ToString("0.00"))
                                 </span>
                             }
                             else
                             {
                                 <span style="color:#333; font-weight:bold;">
-                                    &#8377;@item.Price.ToString("0.00")
+                                    &#8377;@(item.Price.ToString("0.00"))
                                 </span>
                             }
                         </p>
 
+                        <!-- Button -->
                         @if (item.Quantity > 0)
                         {
                             <a href="/Shop/Product/Details/@item.ProductId"
@@ -230,15 +268,13 @@
                         }
                         else
                         {
-                            <button class="btn btn-sm btn-secondary mb-3" disabled>
+                            <button class="btn btn-sm btn-secondary mb-3"
+                                    disabled>
                                 Out of Stock
                             </button>
                         }
 
-
                     </div>
-
-
                 }
                 <div class="clearfix"></div>
             }
@@ -246,6 +282,26 @@
         </div>
 
         <div class="clearfix"></div>
-
     </div>
 </div>
+
+@section Scripts {
+    <script>
+        // ✅ NO e.preventDefault() — categories navigate normally
+        // Only highlight active category in sidebar
+        document.querySelectorAll('#category-menu a').forEach(function (link) {
+            link.addEventListener('mouseenter', function () {
+                if (!this.style.fontWeight ||
+                    this.style.fontWeight !== 'bold') {
+                    this.style.color = '#e74c3c';
+                }
+            });
+            link.addEventListener('mouseleave', function () {
+                if (!this.style.fontWeight ||
+                    this.style.fontWeight !== 'bold') {
+                    this.style.color = '';
+                }
+            });
+        });
+    </script>
+}

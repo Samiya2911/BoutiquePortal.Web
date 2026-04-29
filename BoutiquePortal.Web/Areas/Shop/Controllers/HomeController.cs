@@ -31,6 +31,23 @@ namespace BoutiquePortal.Web.Areas.Shop.Controllers
             return View();
         }
 
+
+        // ======= CONTACT PAGE =======  
+        public async Task<IActionResult> Contact()
+        {
+            var categories = await _categoryService.GetAllAsync();
+            ViewBag.Categories = categories.ToList();  // for nav menu
+            return View();
+        }
+
+        public async Task<IActionResult> Blog()
+        {
+            var categories = await _categoryService.GetAllAsync();
+            ViewBag.Categories = categories.ToList();
+            return View();
+        }
+        
+
         // ======= MY ORDERS (customer) =======
         public IActionResult MyOrders()
         {
