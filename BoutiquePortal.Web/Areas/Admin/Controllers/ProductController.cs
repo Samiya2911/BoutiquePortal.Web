@@ -15,19 +15,21 @@ namespace BoutiquePortal.Web.Areas.Admin.Controllers
         private readonly ISubCategoryService _subCategoryService;
         private readonly IVendorService _vendorService;
         private readonly IWebHostEnvironment _env;
-
+        private readonly IProductSizeService _sizeService;
         public ProductController(
             IProductService service,
             ICategoryService categoryService,
             ISubCategoryService subCategoryService,
             IVendorService vendorService,
-            IWebHostEnvironment env)
+            IWebHostEnvironment env,
+            IProductSizeService sizeService)
         {
             _service = service;
             _categoryService = categoryService;
             _subCategoryService = subCategoryService;
             _vendorService = vendorService;
             _env = env;
+            _sizeService = sizeService;
         }
 
         // ================== INDEX ==================
@@ -56,9 +58,14 @@ namespace BoutiquePortal.Web.Areas.Admin.Controllers
                         .GetByCategoryId(existing.CategoryId)).ToList();
                 }
 
+                // Load existing sizes
+                ViewBag.Sizes = (await _sizeService
+                    .GetByProductAsync(id.Value)).ToList();
+
                 return View(existing ?? new Product());
             }
 
+            ViewBag.Sizes = new List<BoutiquePortal.Model.Models.ProductSize>();
             return View(new Product { IsActive = true });
         }
 
@@ -146,19 +153,37 @@ namespace BoutiquePortal.Web.Areas.Admin.Controllers
             }
 
             // ================== SAVE ==================
+            int savedProductId;
+
             if (model.ProductId == 0)
             {
                 model.CreatedDate = DateTime.Now;
-                await _service.AddAsync(model);
+                int newId = await _service.AddAsync(model);
+                savedProductId = newId;  // use newId
                 TempData["Success"] = "Product added successfully!";
             }
             else
             {
                 await _service.UpdateAsync(model);
+                savedProductId = model.ProductId;  // use existing ID
                 TempData["Success"] = "Product updated successfully!";
             }
 
-            return RedirectToAction(nameof(Index));
+            // Save sizes using savedProductId
+
+            if (savedProductId > 0)
+            {
+                var sizeNames = Request.Form["SizeName"].ToList();
+                var sizeQtys = Request.Form["SizeQty"]
+                .Select(q => int.TryParse(q, out int n) ? n : 0)
+                .ToList();
+
+                if (sizeNames.Any(s => !string.IsNullOrWhiteSpace(s)))
+                {
+                    await _sizeService.SaveSizesAsync(savedProductId, sizeNames, sizeQtys);
+                }
+            }
+                return RedirectToAction(nameof(Index));
         }
 
         // ================== DELETE ==================

@@ -89,6 +89,7 @@ namespace BoutiquePortal.Repositories.Repository
             p.Add("@Quantity", item.Quantity);
             p.Add("@UnitPrice", item.UnitPrice);
             p.Add("@TotalPrice", item.TotalPrice);
+            p.Add("@SelectedSize", item.SelectedSize);
 
             return await conn.ExecuteScalarAsync<int>(
                 "sp_OrderItem_Insert", p,

@@ -143,6 +143,22 @@
                                     </li>
                                 </ul>
 
+                                <h3>
+                                    <a href="/Shop/Product/Details/@item.ProductId">
+                                        @item.ProductName
+                                    </a>
+                                    <span>@item.BrandName</span>
+                                    @* ✅ Show selected size *@
+                                    @if (!string.IsNullOrEmpty(item.SelectedSize))
+                                    {
+                                        <span style="display:inline-block; background:#e74c3c;
+                                 color:white; padding:2px 10px; border-radius:4px;
+                                 font-size:12px; margin-left:5px;">
+                                            Size: @item.SelectedSize
+                                        </span>
+                                    }
+                                </h3>
+
                                 <div class="delivery">
                                     <p>
                                         Sub Total:

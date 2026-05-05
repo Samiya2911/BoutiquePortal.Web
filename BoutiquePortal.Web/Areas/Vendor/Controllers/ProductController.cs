@@ -14,17 +14,20 @@ namespace BoutiquePortal.Web.Areas.Vendor.Controllers
         private readonly ICategoryService _categoryService;
         private readonly ISubCategoryService _subCategoryService;
         private readonly IWebHostEnvironment _env;
+        private readonly IProductSizeService _sizeService;
 
         public ProductController(
             IProductVendorService service,
             ICategoryService categoryService,
             ISubCategoryService subCategoryService,
-            IWebHostEnvironment env)
+            IWebHostEnvironment env,
+            IProductSizeService sizeService)
         {
             _service = service;
             _categoryService = categoryService;
             _subCategoryService = subCategoryService;
             _env = env;
+            _sizeService = sizeService;
         }
 
         // ================== INDEX ==================
@@ -61,9 +64,13 @@ namespace BoutiquePortal.Web.Areas.Vendor.Controllers
                         .GetByCategoryId(existing.CategoryId)).ToList();
                 }
 
+                //  Load sizes for EDIT mode
+                var sizes = await _sizeService.GetByProductAsync(id.Value);
+                ViewBag.Sizes = sizes.ToList();
+
                 return View(existing);
             }
-
+            ViewBag.Sizes = new List<ProductSize>();
             return View(new Product { IsActive = true });
         }
 
@@ -119,6 +126,14 @@ namespace BoutiquePortal.Web.Areas.Vendor.Controllers
                 ViewBag.Categories = (await _categoryService.GetAllAsync()).ToList();
                 ViewBag.SubCategories = (await _subCategoryService
                     .GetByCategoryId(model.CategoryId)).ToList();
+
+                // Reload sizes on validation fail
+                var reloadSizes = model.ProductId > 0
+                    ? (await _sizeService.GetByProductAsync(model.ProductId)).ToList()
+                    : new List<ProductSize>();
+                ViewBag.Sizes = reloadSizes;
+
+
                 return View(model);
             }
 
@@ -148,20 +163,53 @@ namespace BoutiquePortal.Web.Areas.Vendor.Controllers
             }
 
             // ================== SAVE ==================
+
+            int savedProductId;
+
             if (model.ProductId == 0)
             {
                 model.CreatedDate = DateTime.Now;
-                await _service.AddAsync(model);
+
+                var addResult = await _service.AddAsync(model);
+                savedProductId = Convert.ToInt32(addResult);
+                //int newId = await _service.AddAsync(model);
+                //savedProductId = newId;
+                // await _service.AddAsync(model);
                 TempData["Success"] = "Product added successfully!";
             }
             else
             {
                 await _service.UpdateAsync(model);
+                savedProductId = model.ProductId;
                 TempData["Success"] = "Product updated successfully!";
+            }
+
+            // ================== SAVE SIZES ==================
+            if (savedProductId > 0)
+            {
+                var sizeNames = Request.Form["SizeName"].ToList();
+                var sizeQtys = Request.Form["SizeQty"]
+                .Select(q => int.TryParse(q, out int n) ? n : 0)
+                .ToList();
+
+                await _sizeService.SaveSizesAsync(
+                   savedProductId, sizeNames, sizeQtys);
             }
 
             return RedirectToAction(nameof(Index));
         }
+
+
+
+            // ✅ Save sizes if any size name is provided
+            //if (sizeNames.Any(s => !string.IsNullOrWhiteSpace(s)))
+            //{
+            //    await _sizeService.SaveSizesAsync(
+            //        savedProductId, sizeNames, sizeQtys);
+            //}
+
+            //return RedirectToAction(nameof(Index));
+       // }
 
         // ================== DELETE ==================
         [HttpPost]
@@ -169,6 +217,8 @@ namespace BoutiquePortal.Web.Areas.Vendor.Controllers
         public async Task<IActionResult> Delete(int id)
         {
             int vendorId = HttpContext.Session.GetInt32("VendorId") ?? 0;
+
+            await _sizeService.SaveSizesAsync(id, new List<string>(), new List<int>());  // empty = deletes all sizes
             await _service.DeleteAsync(id, vendorId);  // security: only own products
             return Ok();
         }

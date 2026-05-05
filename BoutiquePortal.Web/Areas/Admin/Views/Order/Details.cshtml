@@ -1,4 +1,4 @@
-﻿@model BoutiquePortal.Model.Models.Order
+﻿    @model BoutiquePortal.Model.Models.Order
 @{
     Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
     ViewBag.Title = "Order Details";
@@ -112,6 +112,7 @@
                             </select>
                         </div>
 
+
                         <div class="mb-3">
                             <label class="form-label">Payment Status</label>
                             <select name="paymentStatus" class="form-control">
@@ -187,6 +188,15 @@
 
                                             <td>
                                                 <strong>@item.ProductName</strong>
+                                                @if (!string.IsNullOrEmpty(item.SelectedSize))
+                                                {
+                                                    <br />
+                                                    <span style="background:#e74c3c; color:white;
+                                 padding:2px 8px; border-radius:4px;
+                                 font-size:11px; font-weight:600;">
+                                                        Size: @item.SelectedSize
+                                                    </span>
+                                                }
                                             </td>
 
                                             <td>

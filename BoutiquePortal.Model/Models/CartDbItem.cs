@@ -13,6 +13,7 @@ namespace BoutiquePortal.Model.Models
         public int ProductId { get; set; }
         public int Quantity { get; set; }
         public DateTime AddedDate { get; set; }
+        public string? SelectedSize { get; set; }
 
         // JOIN fields from Product
         public string ProductName { get; set; } = string.Empty;

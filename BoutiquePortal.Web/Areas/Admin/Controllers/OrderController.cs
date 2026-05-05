@@ -9,10 +9,13 @@ namespace BoutiquePortal.Web.Areas.Admin.Controllers
     public class OrderController : Controller
     {
         private readonly IOrderService _orderService;
-
-        public OrderController(IOrderService orderService)
-            => _orderService = orderService;
-
+        private readonly IProductSizeService _sizeService;
+        public OrderController(IOrderService orderService,
+            IProductSizeService sizeService)
+        {
+            _orderService = orderService;
+            _sizeService = sizeService;
+        }
         // ======= INDEX =======
         public async Task<IActionResult> Index()
         {
@@ -28,18 +31,7 @@ namespace BoutiquePortal.Web.Areas.Admin.Controllers
             return View(order);
         }
 
-        // ======= UPDATE STATUS (AJAX) =======
-        //[HttpPost]
-        //[ValidateAntiForgeryToken]
-        //public async Task<IActionResult> UpdateStatus(int orderId,
-        //    string orderStatus, string paymentStatus)
-        //{
-        //    await _orderService.UpdateStatusAsync(orderId, orderStatus, paymentStatus);
-        //    TempData["Success"] = "Order status updated!";
-        //    return RedirectToAction(nameof(Details), new { id = orderId });
-        //}
-
-        // ======= UPDATE STATUS =======
+               // ======= UPDATE STATUS =======
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> UpdateStatus(
@@ -70,8 +62,12 @@ namespace BoutiquePortal.Web.Areas.Admin.Controllers
                 int updated = await _orderService
                     .DecreaseProductQuantityAsync(orderId);
 
+
                 //  Auto mark out-of-stock products inactive
                 await _orderService.UpdateStockStatusAsync();
+               
+                // After existing DecreaseProductQuantityAsync call, add:
+                await _sizeService.DecreaseQuantityAsync(orderId);
 
                 TempData["Success"] = updated > 0
                     ? $"Order status updated! Stock decreased for {updated} product(s)."

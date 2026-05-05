@@ -175,7 +175,8 @@ namespace BoutiquePortal.Web.Areas.Shop.Controllers
                     VendorId = item.VendorId,
                     Quantity = item.Quantity,
                     UnitPrice = item.ActualPrice,
-                    TotalPrice = item.SubTotal
+                    TotalPrice = item.SubTotal,
+                    SelectedSize = item.SelectedSize
                 };
 
                 await _orderService.AddItemAsync(orderItem);

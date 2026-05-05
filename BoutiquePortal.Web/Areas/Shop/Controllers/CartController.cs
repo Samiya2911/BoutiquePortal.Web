@@ -28,7 +28,7 @@ namespace BoutiquePortal.Web.Areas.Shop.Controllers
 
         // ======= ADD TO CART =======
 
-        public async Task<IActionResult> Add(int id, int qty = 1)
+        public async Task<IActionResult> Add(int id, int qty = 1, string? size = null)
         {
             if (HttpContext.Session.GetString("Role") != "Customer")
             {
@@ -56,11 +56,12 @@ namespace BoutiquePortal.Web.Areas.Shop.Controllers
                 Price = product.Price,
                 DiscountPrice = product.DiscountPrice,
                 Quantity = qty,
-                VendorId = product.VendorId
+                VendorId = product.VendorId,
+                SelectedSize = size
             };
             CartHelper.AddItem(HttpContext.Session, cartItem);
 
-            // ✅ Step 2: Sync ENTIRE session cart to DB
+            //  Sync ENTIRE session cart to DB
             //           (replaces DB with exact session quantities)
             int customerId = HttpContext.Session.GetInt32("CustomerId") ?? 0;
             if (customerId > 0)
@@ -68,7 +69,10 @@ namespace BoutiquePortal.Web.Areas.Shop.Controllers
                 await SyncCartToDbAsync(customerId);
             }
 
-            TempData["CartMsg"] = $"'{product.ProductName}' added to cart!";
+            TempData["CartMsg"] = $"'{product.ProductName}'"
+        + (size != null ? $" (Size: {size})" : "")
+        + " added to cart!";
+                
             return RedirectToAction(nameof(Index));
         }
 

@@ -36,6 +36,10 @@ builder.Services.AddScoped<IVendorService, VendorService>();
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<IProductService, ProductService>();
 
+// Product Size
+builder.Services.AddScoped<IProductSizeRepository, ProductSizeRepository>();
+builder.Services.AddScoped<IProductSizeService, ProductSizeService>();
+
 // Product By Vendor
 builder.Services.AddScoped<IProductVendorRepository, ProductVendorRepository>();
 builder.Services.AddScoped<IProductVendorService, ProductVendorService>();

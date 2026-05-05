@@ -16,7 +16,7 @@
                     <img src="~/images/product/@Model.ProductImage"
                          class="img-responsive"
                          style="width:100%; border-radius:8px;
-                                    box-shadow: 0 4px 15px rgba(0,0,0,0.1);"
+                                        box-shadow: 0 4px 15px rgba(0,0,0,0.1);"
                          onerror="this.src='/shop/images/product1.jpg'"
                          alt="@Model.ProductName" />
                 }
@@ -48,7 +48,7 @@
                             &#8377;@Model.DiscountPrice.Value.ToString("0.00")
                         </span>
                         <span style="background:#e74c3c; color:white; padding:3px 8px;
-                                         border-radius:4px; font-size:12px; margin-left:8px;">
+                                             border-radius:4px; font-size:12px; margin-left:8px;">
                             SALE
                         </span>
                     }
@@ -61,7 +61,7 @@
                 </div>
 
                 <!-- Stock -->
-               @*  <p style="margin-bottom:15px;">
+                @*  <p style="margin-bottom:15px;">
                     @if (Model.Quantity > 0)
                     {
                         <span style="color:green;">
@@ -92,6 +92,61 @@
                     }
                 </div>
 
+
+                <!-- ======= SIZE SELECTOR ======= -->
+                @{
+                    var sizes = ViewBag.ProductSizes as
+                    IEnumerable<BoutiquePortal.Model.Models.ProductSize>;
+                }
+
+                @if (sizes != null && sizes.Any())
+                {
+                    <div style="margin: 15px 0;">
+                        <p style="font-weight:600; margin-bottom:10px;">
+                            Select Size: <span id="selected-size-label"
+                                               style="color:#e74c3c;"></span>
+                        </p>
+
+                        <div style="display:flex; gap:8px; flex-wrap:wrap;
+                            margin-bottom:5px;">
+                            @foreach (var s in sizes)
+                            {
+                                <button type="button"
+                                        onclick="selectSize(this, '@s.SizeName', @s.Quantity)"
+                                        class="size-btn"
+                                        data-size="@s.SizeName"
+                                        data-qty="@s.Quantity"
+                                        style="padding:8px 18px; border:2px solid #ddd;
+                                               background:white; border-radius:6px;
+                                               cursor:pointer; font-weight:600;
+                                               font-size:14px; transition:all 0.2s;
+                                               @(s.Quantity == 0
+                                                                                                                   ? "opacity:0.4; cursor:not-allowed;"
+                                                                                                                   : "")">
+                            @s.SizeName
+                            @if (s.Quantity == 0)
+                                    {
+                                        <br />
+                                        <small style="font-size:10px; color:#e74c3c;">
+                                            Out
+                                        </small>
+                                    }
+                                </button>
+                            }
+                        </div>
+
+                        <small id="size-stock-info"
+                               style="color:#888; font-size:12px;">
+                        </small>
+                        <small id="err-size"
+                               style="color:#e74c3c; font-size:12px; display:block;">
+                        </small>
+                    </div>
+                }
+
+                <!-- Hidden size field for Add to Cart link -->
+                <input type="hidden" id="selected-size-val" value="" />
+
                 <!-- Description -->
                 @if (!string.IsNullOrEmpty(Model.Description))
                 {
@@ -109,7 +164,7 @@
                 <hr />
 
                 <!-- ======= BUY BUTTON ======= -->
-                @if (Model.Quantity > 0)
+                @*  @if (Model.Quantity > 0)
                 {
                     @if (Context.Session.GetString("Role") == "Customer")
                     {
@@ -170,10 +225,57 @@
 
                 <a href="/Shop/Shop" class="btn btn-outline-secondary btn-lg">
                     ← Back to Shop
+                </a> *@
+
+
+                <!-- NEW SIZE SELECTOR SCRIPT Samiya  Add to Cart button  -->
+                @if (Model.Quantity > 0)
+                {
+                    @if (Context.Session.GetString("Role") == "Customer")
+                    {
+                        <!-- Quantity selector -->
+                        <div style="display:flex; align-items:center;
+                                    gap:10px; margin-bottom:15px;">
+                            <label style="font-weight:600;">Qty:</label>
+                            <button onclick="changeQty(-1)"
+                                    style="width:32px; height:32px; border:1px solid #ddd;
+                                           background:#f5f5f5; cursor:pointer;
+                                           border-radius:4px; font-size:16px;">
+                                −
+                            </button>
+                            <span id="qty-display"
+                                  style="font-size:18px; font-weight:bold;
+                                         min-width:30px; text-align:center;">1</span>
+                            <button onclick="changeQty(1)"
+                                    style="width:32px; height:32px; border:1px solid #ddd;
+                                           background:#f5f5f5; cursor:pointer;
+                                           border-radius:4px; font-size:16px;">
+                                +
+                            </button>
+                        </div>
+
+                        <!-- ✅ Add to Cart with size -->
+                        <button onclick="addToCart()"
+                                class="btn btn-primary btn-lg"
+                                style="margin-right:10px;">
+                            🛒 Add to Cart
+                        </button>
+                    }
+                    else
+                    {
+                        <a href="/Customer/CustomerAccount/Login"
+                           class="btn btn-primary btn-lg">
+                            Login to Buy
+                        </a>
+                    }
+                }
+
+                <a href="/Shop/Shop" class="btn btn-outline-secondary btn-lg">
+                    ← Back to Shop
                 </a>
 
-               
-                @section Scripts {
+                <!-- NEW SIZE SELECTOR SCRIPT  -->
+                @*  @section Scripts {
                     <script>
                         var qty    = 1;
                         var maxQty = @Model.Quantity;
@@ -184,7 +286,66 @@
                             document.getElementById('add-to-cart-btn').href =
                                 '/Shop/Cart/Add/@Model.ProductId?qty=' + qty;
                         }
+                    </script> *@
+
+                @section Scripts {
+                    <script>
+                            var qty         = 1;
+                            var maxQty      = @Model.Quantity;
+                            var selectedSize = '';
+                            var hasSizes    = @((sizes != null && sizes.Any())
+                                                                                                                                                                                ? "true" : "false");
+
+                    function changeQty(delta) {
+                        qty = Math.max(1, Math.min(maxQty, qty + delta));
+                        document.getElementById('qty-display').textContent = qty;
+                    }
+
+                            function selectSize(btn, sizeName, sizeQty) {
+                                if (sizeQty <= 0) return;  // can't select out-of-stock size
+
+                                // Reset all buttons
+                                document.querySelectorAll('.size-btn').forEach(function (b) {
+                                    b.style.border     = '2px solid #ddd';
+                                    b.style.background = 'white';
+                                    b.style.color      = '#333';
+                                });
+
+                                // Highlight selected
+                                btn.style.border     = '2px solid #e74c3c';
+                                btn.style.background = '#e74c3c';
+                                btn.style.color      = 'white';
+
+                                selectedSize = sizeName;
+                                document.getElementById('selected-size-val').value = sizeName;
+                                document.getElementById('selected-size-label').textContent = sizeName;
+                                document.getElementById('size-stock-info').textContent =
+                                    sizeQty + ' in stock for this size';
+                                document.getElementById('err-size').textContent = '';
+
+                                // Update max qty for selected size
+                                maxQty = sizeQty;
+                                if (qty > maxQty) qty = maxQty;
+                                document.getElementById('qty-display').textContent = qty;
+                            }
+
+                            function addToCart() {
+                                // If product has sizes, must select one
+                                if (hasSizes && !selectedSize) {
+                                    document.getElementById('err-size').textContent =
+                                        '⚠️ Please select a size first!';
+                                    document.getElementById('err-size').style.display = 'block';
+                                    return;
+                                }
+
+                                var url = '/Shop/Cart/Add/@Model.ProductId?qty=' + qty;
+                                if (selectedSize)
+                                    url += '&size=' + encodeURIComponent(selectedSize);
+
+                                window.location.href = url;
+                            }
                     </script>
+                                
                 }
             </div>
 

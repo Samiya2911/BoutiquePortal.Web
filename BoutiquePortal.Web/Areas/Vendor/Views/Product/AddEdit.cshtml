@@ -94,10 +94,11 @@
                 <input type="text"
                        id="BrandName"
                        name="BrandName"
-                       value="@Model.BrandName"
+                       @* value="@Model.BrandName" *@
+                       value="@Context.Session.GetString("BrandName")"
                        class="form-control"
                        readonly
-                       placeholder="From your vendor profile" />
+                      @*  placeholder="From your vendor profile" *@ />
                 <small class="text-muted">
                     Auto-filled from your brand —
                     cannot be changed here
@@ -143,6 +144,121 @@
                        placeholder="0" />
                 <span id="err-Quantity" class="text-danger small"></span>
             </div>
+
+
+            <!-- ======= SIZES SECTION ======= -->
+            <div class="mb-3">
+                <label class="form-label fw-bold">
+                    Product Sizes &amp; Stock
+                    <small class="text-muted fw-normal">
+                        (Add sizes with individual quantities)
+                    </small>
+                </label>
+
+                <div id="sizes-container">
+                    @{
+                        var existingSizes = ViewBag.Sizes as
+                        List<BoutiquePortal.Model.Models.ProductSize>
+                        ?? new List<BoutiquePortal.Model.Models.ProductSize>();
+                    }
+
+                    @if (existingSizes.Any())
+                    {
+                        foreach (var s in existingSizes)
+                        {
+                            <div class="size-row d-flex gap-2 mb-2 align-items-center">
+                                <input type="text"
+                                       name="SizeName"
+                                       value="@s.SizeName"
+                                       class="form-control"
+                                       style="max-width:120px;"
+                                       placeholder="e.g. M" />
+                                <input type="number"
+                                       name="SizeQty"
+                                       value="@s.Quantity"
+                                       class="form-control"
+                                       style="max-width:100px;"
+                                       placeholder="Stock"
+                                       min="0" />
+                                <span class="text-muted small">units</span>
+                                <button type="button"
+                                        onclick="removeSize(this)"
+                                        class="btn btn-sm btn-danger">
+                                    ✕
+                                </button>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <div class="size-row d-flex gap-2 mb-2 align-items-center">
+                            <input type="text"
+                                   name="SizeName"
+                                   class="form-control"
+                                   style="max-width:120px;"
+                                   placeholder="e.g. M" />
+                            <input type="number"
+                                   name="SizeQty"
+                                   class="form-control"
+                                   style="max-width:100px;"
+                                   placeholder="Stock"
+                                   min="0" />
+                            <span class="text-muted small">units</span>
+                            <button type="button"
+                                    onclick="removeSize(this)"
+                                    class="btn btn-sm btn-danger">
+                                ✕
+                            </button>
+                        </div>
+                    }
+                </div>
+
+                <!-- Quick Add Buttons -->
+                <div class="mt-2 mb-2">
+                    <small class="text-muted me-1">Quick add:</small>
+                    <button type="button" onclick="quickAddSize('S')"
+                            class="btn btn-sm btn-outline-secondary ms-1"
+                            style="font-size:11px; padding:2px 8px;">
+                        S
+                    </button>
+                    <button type="button" onclick="quickAddSize('M')"
+                            class="btn btn-sm btn-outline-secondary ms-1"
+                            style="font-size:11px; padding:2px 8px;">
+                        M
+                    </button>
+                    <button type="button" onclick="quickAddSize('L')"
+                            class="btn btn-sm btn-outline-secondary ms-1"
+                            style="font-size:11px; padding:2px 8px;">
+                        L
+                    </button>
+                    <button type="button" onclick="quickAddSize('XL')"
+                            class="btn btn-sm btn-outline-secondary ms-1"
+                            style="font-size:11px; padding:2px 8px;">
+                        XL
+                    </button>
+                    <button type="button" onclick="quickAddSize('XXL')"
+                            class="btn btn-sm btn-outline-secondary ms-1"
+                            style="font-size:11px; padding:2px 8px;">
+                        XXL
+                    </button>
+                    <button type="button" onclick="quickAddSize('Free Size')"
+                            class="btn btn-sm btn-outline-secondary ms-1"
+                            style="font-size:11px; padding:2px 8px;">
+                        Free Size
+                    </button>
+                </div>
+
+                <button type="button"
+                        onclick="addSizeRow()"
+                        class="btn btn-sm btn-outline-primary">
+                    + Add Size
+                </button>
+
+                <small class="text-muted d-block mt-1">
+                    Leave size name empty to skip that row.
+                </small>
+            </div>
+
 
             <!-- DESCRIPTION -->
             <div class="mb-3">
@@ -220,4 +336,56 @@
         </script>
     }
     <script src="~/js/vendor/product.js"></script>
+    <script>
+        // ======= SIZE MANAGEMENT =======
+        function addSizeRow() {
+            var row = '<div class="size-row d-flex gap-2 mb-2 align-items-center">'
+                + '<input type="text" name="SizeName" class="form-control"'
+                + ' style="max-width:120px;" placeholder="e.g. XL" />'
+                + '<input type="number" name="SizeQty" class="form-control"'
+                + ' style="max-width:100px;" placeholder="Stock" min="0" />'
+                + '<span class="text-muted small">units</span>'
+                + '<button type="button" onclick="removeSize(this)"'
+                + ' class="btn btn-sm btn-danger">✕</button>'
+                + '</div>';
+            document.getElementById('sizes-container')
+                    .insertAdjacentHTML('beforeend', row);
+        }
+
+        function removeSize(btn) {
+            btn.closest('.size-row').remove();
+        }
+
+        function quickAddSize(sizeName) {
+            // Check if size already exists
+            var existing = Array.from(
+                document.querySelectorAll('input[name="SizeName"]'))
+                .find(function (i) {
+                    return i.value.trim() === sizeName;
+                });
+
+            if (existing) {
+                existing.focus();
+                existing.style.border = '2px solid #e74c3c';
+                setTimeout(function () {
+                    existing.style.border = '';
+                }, 2000);
+                return;
+            }
+
+            var row = '<div class="size-row d-flex gap-2 mb-2 align-items-center">'
+                + '<input type="text" name="SizeName" value="' + sizeName + '"'
+                + ' class="form-control" style="max-width:120px;"'
+                + ' placeholder="e.g. ' + sizeName + '" />'
+                + '<input type="number" name="SizeQty" value="0"'
+                + ' class="form-control" style="max-width:100px;"'
+                + ' placeholder="Stock" min="0" />'
+                + '<span class="text-muted small">units</span>'
+                + '<button type="button" onclick="removeSize(this)"'
+                + ' class="btn btn-sm btn-danger">✕</button>'
+                + '</div>';
+            document.getElementById('sizes-container')
+                    .insertAdjacentHTML('beforeend', row);
+        }
+    </script>
 }

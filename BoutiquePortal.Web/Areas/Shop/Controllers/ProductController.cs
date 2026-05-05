@@ -8,13 +8,16 @@ namespace BoutiquePortal.Web.Areas.Shop.Controllers
     {
         private readonly IProductService _productService;
         private readonly ICategoryService _categoryService;
+        private readonly IProductSizeService _sizeService;
 
         public ProductController(
             IProductService productService,
-            ICategoryService categoryService)
+            ICategoryService categoryService,
+            IProductSizeService sizeService)
         {
             _productService = productService;
             _categoryService = categoryService;
+            _sizeService = sizeService;
         }
 
         // ======= SINGLE PRODUCT DETAIL =======
@@ -26,6 +29,8 @@ namespace BoutiquePortal.Web.Areas.Shop.Controllers
             if (product == null) return NotFound();
 
             ViewBag.Categories = categories.ToList();
+
+            ViewBag.ProductSizes = await _sizeService.GetByProductAsync(id);
 
             return View(product);
         }

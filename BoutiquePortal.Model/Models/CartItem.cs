@@ -16,6 +16,7 @@ namespace BoutiquePortal.Model.Models
         public decimal? DiscountPrice { get; set; }
         public int Quantity { get; set; } = 1;
         public int VendorId { get; set; }
+        public string? SelectedSize { get; set; }
 
         // Calculated property
         public decimal ActualPrice =>
