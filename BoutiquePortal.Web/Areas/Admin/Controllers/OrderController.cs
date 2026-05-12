@@ -31,47 +31,101 @@ namespace BoutiquePortal.Web.Areas.Admin.Controllers
             return View(order);
         }
 
-               // ======= UPDATE STATUS =======
+        // ======= UPDATE STATUS =======
+        //[HttpPost]
+        //[ValidateAntiForgeryToken]
+        //public async Task<IActionResult> UpdateStatus(
+        //    int orderId,
+        //    string orderStatus,
+        //    string paymentStatus)
+        //{
+        //    // ======= GET CURRENT ORDER BEFORE UPDATE =======
+        //    var existingOrder = await _orderService.GetByIdAsync(orderId);
+
+        //    // ======= UPDATE STATUS IN DB =======
+        //    await _orderService.UpdateStatusAsync(
+        //        orderId, orderStatus, paymentStatus);
+
+        //    // ======= CHECK IF CONDITION MET =======
+        //    // Trigger quantity decrease ONLY when:
+        //    // 1. Order just became "Shipped"
+        //    // 2. Payment is "Paid"
+        //    // 3. Was NOT already "Shipped" before (prevent double decrease)
+
+        //    bool justShipped = orderStatus == "Shipped"
+        //                    && paymentStatus == "Paid"
+        //                    && existingOrder?.OrderStatus != "Shipped";
+
+        //    if (justShipped)
+        //    {
+        //        //  Decrease product quantities
+        //        int updated = await _orderService
+        //            .DecreaseProductQuantityAsync(orderId);
+
+
+        //        //  Auto mark out-of-stock products inactive
+        //        await _orderService.UpdateStockStatusAsync();
+
+        //        // After existing DecreaseProductQuantityAsync call, add:
+        //        await _sizeService.DecreaseQuantityAsync(orderId);
+
+        //        TempData["Success"] = updated > 0
+        //            ? $"Order status updated! Stock decreased for {updated} product(s)."
+        //            : "Order status updated!";
+        //    }
+        //    else
+        //    {
+        //        TempData["Success"] = "Order status updated successfully!";
+        //    }
+
+        //    return RedirectToAction(nameof(Details), new { id = orderId });
+        //}
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> UpdateStatus(
-            int orderId,
-            string orderStatus,
-            string paymentStatus)
+    int orderId,
+    string orderStatus,
+    string paymentStatus)
         {
-            // ======= GET CURRENT ORDER BEFORE UPDATE =======
+            // ✅ STEP 1: Get BEFORE update
             var existingOrder = await _orderService.GetByIdAsync(orderId);
 
-            // ======= UPDATE STATUS IN DB =======
+            string oldOrderStatus = existingOrder?.OrderStatus ?? "";
+            string oldPaymentStatus = existingOrder?.PaymentStatus ?? "";
+
+            // ✅ STEP 2: Update status in DB
             await _orderService.UpdateStatusAsync(
                 orderId, orderStatus, paymentStatus);
 
-            // ======= CHECK IF CONDITION MET =======
-            // Trigger quantity decrease ONLY when:
-            // 1. Order just became "Shipped"
-            // 2. Payment is "Paid"
-            // 3. Was NOT already "Shipped" before (prevent double decrease)
+            // ✅ STEP 3: Trigger when Delivered + Paid
+            //            AND was NOT already Delivered+Paid before
+            bool isNowDeliveredAndPaid =
+                orderStatus == "Delivered" &&
+                paymentStatus == "Paid";
 
-            bool justShipped = orderStatus == "Shipped"
-                            && paymentStatus == "Paid"
-                            && existingOrder?.OrderStatus != "Shipped";
+            bool wasAlreadyDeliveredAndPaid =
+                oldOrderStatus == "Delivered" &&
+                oldPaymentStatus == "Paid";
 
-            if (justShipped)
+            bool shouldDecrease = isNowDeliveredAndPaid
+                               && !wasAlreadyDeliveredAndPaid;
+
+            if (shouldDecrease)
             {
-                //  Decrease product quantities
+                // ✅ Decrease overall product quantity
                 int updated = await _orderService
                     .DecreaseProductQuantityAsync(orderId);
 
-
-                //  Auto mark out-of-stock products inactive
-                await _orderService.UpdateStockStatusAsync();
-               
-                // After existing DecreaseProductQuantityAsync call, add:
+                // ✅ Decrease size-specific quantity
                 await _sizeService.DecreaseQuantityAsync(orderId);
 
+                // ✅ Auto deactivate out-of-stock products
+                await _orderService.UpdateStockStatusAsync();
+
                 TempData["Success"] = updated > 0
-                    ? $"Order status updated! Stock decreased for {updated} product(s)."
-                    : "Order status updated!";
+                    ? $"✅ Delivered! Stock reduced for {updated} product(s)."
+                    : "✅ Status updated!";
             }
             else
             {
@@ -80,6 +134,8 @@ namespace BoutiquePortal.Web.Areas.Admin.Controllers
 
             return RedirectToAction(nameof(Details), new { id = orderId });
         }
+
+
         // ======= DELETE =======
         [HttpPost]
         [ValidateAntiForgeryToken]

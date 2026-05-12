@@ -329,21 +329,37 @@
                                 document.getElementById('qty-display').textContent = qty;
                             }
 
+                            // function addToCart() {
+                            //     // If product has sizes, must select one
+                            //     if (hasSizes && !selectedSize) {
+                            //         document.getElementById('err-size').textContent =
+                            //             '⚠️ Please select a size first!';
+                            //         document.getElementById('err-size').style.display = 'block';
+                            //         return;
+                            //     }
+
+                            //     var url = '/Shop/Cart/Add/@Model.ProductId?qty=' + qty;
+                            //     if (selectedSize)
+                            //         url += '&size=' + encodeURIComponent(selectedSize);
+
+                            //     window.location.href = url;
+                            // }
+
                             function addToCart() {
-                                // If product has sizes, must select one
-                                if (hasSizes && !selectedSize) {
-                                    document.getElementById('err-size').textContent =
-                                        '⚠️ Please select a size first!';
-                                    document.getElementById('err-size').style.display = 'block';
-                                    return;
-                                }
-
-                                var url = '/Shop/Cart/Add/@Model.ProductId?qty=' + qty;
-                                if (selectedSize)
-                                    url += '&size=' + encodeURIComponent(selectedSize);
-
-                                window.location.href = url;
+                            if (hasSizes && !selectedSize) {
+                                document.getElementById('err-size').textContent =
+                                    '⚠️ Please select a size first!';
+                                return;
                             }
+
+                            var url = '/Shop/Cart/Add/@Model.ProductId?qty=' + qty;
+
+                            // ✅ Size gets passed in URL
+                            if (selectedSize)
+                                url += '&size=' + encodeURIComponent(selectedSize);
+
+                            window.location.href = url;
+                        }
                     </script>
                                 
                 }

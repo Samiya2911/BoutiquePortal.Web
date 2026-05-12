@@ -211,6 +211,19 @@ namespace BoutiquePortal.Web.Areas.Shop.Controllers
         }
 
         // ======= MY ORDERS =======
+        //public async Task<IActionResult> MyOrders()
+        //{
+        //    if (HttpContext.Session.GetString("Role") != "Customer")
+        //        return RedirectToAction("Login", "CustomerAccount",
+        //            new { area = "Customer" });
+
+        //    int customerId = HttpContext.Session.GetInt32("CustomerId") ?? 0;
+        //    var orders = await _orderService.GetByCustomerAsync(customerId);
+
+        //    return View(orders);
+        //}
+
+        // ======= My Orders — loads full order details including items =======
         public async Task<IActionResult> MyOrders()
         {
             if (HttpContext.Session.GetString("Role") != "Customer")
@@ -218,9 +231,22 @@ namespace BoutiquePortal.Web.Areas.Shop.Controllers
                     new { area = "Customer" });
 
             int customerId = HttpContext.Session.GetInt32("CustomerId") ?? 0;
-            var orders = await _orderService.GetByCustomerAsync(customerId);
 
-            return View(orders);
+            // Get order headers for this customer
+            var orderHeaders = await _orderService.GetByCustomerAsync(customerId);
+
+            // Load full order details (with items + images) for each order
+            var fullOrders = new List<Order>();
+            foreach (var o in orderHeaders)
+            {
+                var full = await _orderService.GetByIdAsync(o.OrderId);
+                if (full != null)
+                    fullOrders.Add(full);
+            }
+
+            return View(fullOrders);
         }
+
+
     }
 }
