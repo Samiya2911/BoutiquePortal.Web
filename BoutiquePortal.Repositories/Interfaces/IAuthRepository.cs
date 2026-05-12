@@ -12,5 +12,8 @@ namespace BoutiquePortal.Repositories.Interfaces
         Task<Admin?> GetAdminByEmailAsync(string email);
         Task<Vendor?> GetVendorByEmailAsync(string email);
         Task<int> RegisterVendorAsync(Vendor vendor);
+
+        Task UpdateAdminPasswordAsync(int adminId, string hashedPassword);
+        Task UpdateVendorPasswordAsync(int vendorId, string hashedPassword);
     }
 }

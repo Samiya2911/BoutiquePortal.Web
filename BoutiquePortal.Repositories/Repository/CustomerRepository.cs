@@ -1,14 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using BoutiquePortal.Model.Helpers;
 using BoutiquePortal.Model.Models;
 using BoutiquePortal.Repositories.Interfaces;
 using Dapper;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
+using System;
+using System.Collections.Generic;
 using System.Data;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace BoutiquePortal.Repositories.Repository
 {
@@ -55,12 +56,12 @@ namespace BoutiquePortal.Repositories.Repository
             var p = new DynamicParameters();
             p.Add("@FullName", customer.FullName);
             p.Add("@Email", customer.Email);
-            p.Add("@Password", customer.Password);
+            //p.Add("@Password", customer.Password);
+            p.Add("@Password", PasswordHelper.Hash(customer.Password)); // ✅ HASH
             p.Add("@Phone", customer.Phone);
 
             return await conn.ExecuteScalarAsync<int>(
-                "sp_Customer_Insert",
-                p,
+                "sp_Customer_Insert",p,
                 commandType: CommandType.StoredProcedure);
         }
 

@@ -64,5 +64,24 @@ namespace BoutiquePortal.Repositories.Repository
                 commandType: CommandType.StoredProcedure
             );
         }
+
+        public async Task UpdateAdminPasswordAsync(
+    int adminId, string hashedPassword)
+        {
+            using var conn = new SqlConnection(_connectionString);
+            await conn.ExecuteAsync(
+                "UPDATE Admin SET Password = @Password WHERE AdminId = @AdminId",
+                new { AdminId = adminId, Password = hashedPassword });
+        }
+
+        public async Task UpdateVendorPasswordAsync(
+            int vendorId, string hashedPassword)
+        {
+            using var conn = new SqlConnection(_connectionString);
+            await conn.ExecuteAsync(
+                "UPDATE Vendors SET Password = @Password WHERE VendorId = @VendorId",
+                new { VendorId = vendorId, Password = hashedPassword });
+        }
+
     }
 }
