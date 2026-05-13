@@ -33,7 +33,7 @@ namespace BoutiquePortal.Web.Areas.Shop.Controllers
             if (HttpContext.Session.GetString("Role") != "Customer")
             {
                 TempData["CartMsg"] = "Please login to add items to cart.";
-                return RedirectToAction("Login", "Account",
+                return RedirectToAction("Login", "CustomerAccount",
                     new { area = "Customer" });
             }
 
@@ -111,9 +111,16 @@ namespace BoutiquePortal.Web.Areas.Shop.Controllers
             var item = cart.FirstOrDefault(c => c.ProductId == productId);
             var total = CartHelper.GetCartTotal(HttpContext.Session);
 
+            //  Make sure SubTotal is calculated correctly
+            decimal itemSubTotal = item != null
+                ? item.ActualPrice * item.Quantity
+                : 0;
+
             return Json(new
             {
                 success = true,
+                subTotal = itemSubTotal.ToString("N2"),
+                //cartTotal = total.ToString("N2"),
                 cartTotal = CartHelper.GetCartTotal(HttpContext.Session).ToString("N2"),
                 cartCount = CartHelper.GetCartCount(HttpContext.Session)
                 //success = true,

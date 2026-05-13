@@ -255,7 +255,129 @@
     </div>
 </div>
 
+
 @section Scripts {
+    <script>
+        // ======= REMOVE ITEM =======
+        document.querySelectorAll('.remove-item').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                var productId = this.getAttribute('data-product-id');
+
+                if (!confirm('Remove this item from cart?')) return;
+
+                fetch('/Shop/Cart/Remove', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    },
+                    body: 'productId=' + productId
+                })
+                .then(function(r) { return r.json(); })
+                .then(function(data) {
+                    if (data.success) {
+                        var row = document.getElementById(
+                            'cart-row-' + productId);
+                        if (row) {
+                            row.style.transition = 'opacity 0.3s';
+                            row.style.opacity    = '0';
+                            setTimeout(function () {
+                                row.remove();
+                                updateSummary(data.cartTotal, data.cartCount);
+                                var rows = document.querySelectorAll('.cart-header');
+                                if (rows.length === 0) location.reload();
+                            }, 300);
+                        }
+                    }
+                })
+                .catch(function() {
+                    alert('Error removing item.');
+                });
+            });
+        });
+
+        // ======= QTY BUTTONS =======
+        document.querySelectorAll('.qty-btn').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                var productId  = this.getAttribute('data-product-id');
+                var qtyEl      = document.getElementById('qty-' + productId);
+                var currentQty = parseInt(qtyEl.textContent.trim());
+                var isPlus     = this.classList.contains('btn-plus');
+                var newQty     = isPlus ? currentQty + 1 : currentQty - 1;
+
+                // Remove if qty reaches 0
+                if (newQty <= 0) {
+                    if (confirm('Remove this item from cart?')) {
+                        var removeBtn = document.querySelector(
+                            '.remove-item[data-product-id="' + productId + '"]');
+                        if (removeBtn) removeBtn.click();
+                    }
+                    return;
+                }
+
+                fetch('/Shop/Cart/UpdateQty', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    },
+                    body: 'productId=' + productId + '&quantity=' + newQty
+                })
+                .then(function(r) { return r.json(); })
+                .then(function(data) {
+                    if (data.success) {
+                        // ✅ Update qty display
+                        qtyEl.textContent = newQty;
+
+                        // ✅ Update item subtotal
+                        var subEl = document.getElementById(
+                            'subtotal-' + productId);
+                        if (subEl) {
+                            // ✅ FIX: check property exists before using
+                            if (data.subTotal !== undefined && data.subTotal !== null) {
+                                subEl.innerHTML = '&#8377;' + data.subTotal;
+                            }
+                        }
+
+                        // ✅ Update cart summary
+                        updateSummary(data.cartTotal, data.cartCount);
+                    }
+                })
+                .catch(function() {
+                    alert('Error updating quantity.');
+                });
+            });
+        });
+
+        // ======= UPDATE SUMMARY =======
+        function updateSummary(cartTotal, cartCount) {
+            var delivery = @(Model.Any() ? 100 : 0);
+
+            // ✅ Parse cartTotal safely
+            var subNum = parseFloat(
+                String(cartTotal).replace(/,/g, ''));
+            var grandTotal = isNaN(subNum)
+                ? 0
+                : subNum + delivery;
+
+            // Update subtotal display
+            var subEl = document.getElementById('cart-subtotal');
+            if (subEl) subEl.innerHTML = '&#8377;' + cartTotal;
+
+            // Update grand total display
+            var totalEl = document.getElementById('cart-grandtotal');
+            if (totalEl)
+                totalEl.innerHTML = '&#8377;' + grandTotal.toFixed(2);
+
+            // Update cart count in header
+            document.querySelectorAll('.simpleCart_quantity')
+                    .forEach(function(el) {
+                        el.textContent = cartCount;
+                    });
+        }
+    </script>
+}
+
+
+@* @section Scripts {
     <script>
         var antiForgeryToken = '@Html.AntiForgeryToken()';
 
@@ -356,4 +478,4 @@
             countEls.forEach(el => el.textContent = cartCount);
         }
     </script>
-}
+} *@

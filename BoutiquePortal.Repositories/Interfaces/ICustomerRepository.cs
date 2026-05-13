@@ -18,5 +18,6 @@ namespace BoutiquePortal.Repositories.Interfaces
         Task<int> ToggleStatusAsync(int customerId, bool isActive);
         Task<Customer?> GetByIdWithPasswordAsync(int customerId);
         Task<int> DeleteAsync(int customerId);
+        Task UpdatePasswordByEmailAsync(string email, string hashedPassword);
     }
 }

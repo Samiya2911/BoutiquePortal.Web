@@ -133,14 +133,6 @@ namespace BoutiquePortal.Repositories.Repository
                 ?? new VendorEarningsVM();
         }
 
-        //public async Task<IEnumerable<Order>> GetByCustomerAsync(int customerId)
-        //{
-        //    using var conn = new SqlConnection(_conn);
-        //    return await conn.QueryAsync<Order>(
-        //        "sp_Order_GetByCustomer",
-        //        new { CustomerId = customerId },
-        //        commandType: CommandType.StoredProcedure);
-        //}
         public async Task<IEnumerable<Order>> GetByCustomerAsync(int customerId)
         {
             using var conn = new SqlConnection(_conn);

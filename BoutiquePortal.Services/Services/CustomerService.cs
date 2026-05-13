@@ -100,7 +100,7 @@
 //}
 
 
-using BoutiquePortal.Model.Helpers;   // ✅ ADD
+using BoutiquePortal.Model.Helpers;   
 using BoutiquePortal.Model.Models;
 using BoutiquePortal.Repositories.Interfaces;
 using BoutiquePortal.Services.Interfaces;
@@ -131,14 +131,14 @@ namespace BoutiquePortal.Services.Services
             if (customer == null)
                 return (false, "Invalid email or password.", null);
 
-            // ✅ Verify — handles both plain text and hashed
+            // Verify — handles both plain text and hashed
             if (!PasswordHelper.Verify(password, customer.Password))
                 return (false, "Invalid email or password.", null);
 
             if (!customer.IsActive)
                 return (false, "Your account has been deactivated.", null);
 
-            // ✅ Re-save as hashed if still plain text
+            // Re-save as hashed if still plain text
             if (!PasswordHelper.IsHashed(customer.Password))
             {
                 await _repo.UpdatePasswordAsync(
@@ -181,17 +181,17 @@ namespace BoutiquePortal.Services.Services
                 string currentPassword,
                 string newPassword)
         {
-            // ✅ Use GetByIdWithPassword to get password field
+            // Use GetByIdWithPassword to get password field
             var customer = await _repo.GetByIdWithPasswordAsync(customerId);
 
             if (customer == null)
                 return (false, "Customer not found.");
 
-            // ✅ Verify current password (handles plain + hashed)
+            // Verify current password (handles plain + hashed)
             if (!PasswordHelper.Verify(currentPassword, customer.Password))
                 return (false, "Current password is incorrect.");
 
-            // ✅ Save new password as hash
+            // Save new password as hash
             await _repo.UpdatePasswordAsync(
                 customerId,
                 PasswordHelper.Hash(newPassword));

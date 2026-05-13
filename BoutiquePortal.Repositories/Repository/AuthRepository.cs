@@ -83,5 +83,13 @@ namespace BoutiquePortal.Repositories.Repository
                 new { VendorId = vendorId, Password = hashedPassword });
         }
 
+        public async Task UpdateVendorPasswordByEmailAsync(
+    string email, string hashedPassword)
+        {
+            using var conn = new SqlConnection(_connectionString);
+            await conn.ExecuteAsync(
+                "UPDATE Vendors SET Password = @Password WHERE Email = @Email",
+                new { Email = email, Password = hashedPassword });
+        }
     }
 }

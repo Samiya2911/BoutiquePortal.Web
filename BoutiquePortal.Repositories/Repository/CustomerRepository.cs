@@ -119,5 +119,13 @@ namespace BoutiquePortal.Repositories.Repository
                 new { CustomerId = customerId },
                 commandType: CommandType.StoredProcedure);
         }
+
+        public async Task UpdatePasswordByEmailAsync(string email, string hashedPassword)
+        {
+            using var conn = new SqlConnection(_conn);
+            await conn.ExecuteAsync(
+                "UPDATE Customer SET Password = @Password WHERE Email = @Email",
+                new { Email = email, Password = hashedPassword });
+        }
     }
 }

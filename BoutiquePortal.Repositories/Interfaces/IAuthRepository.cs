@@ -15,5 +15,6 @@ namespace BoutiquePortal.Repositories.Interfaces
 
         Task UpdateAdminPasswordAsync(int adminId, string hashedPassword);
         Task UpdateVendorPasswordAsync(int vendorId, string hashedPassword);
+        Task UpdateVendorPasswordByEmailAsync(string email, string hashedPassword);
     }
 }

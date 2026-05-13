@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using BoutiquePortal.Model.Models;
 using BoutiquePortal.Repositories.Interfaces;
 using BoutiquePortal.Services.Interfaces;
-//using BoutiquePortal.Web.Helpers;
 using Microsoft.AspNetCore.Http;
 
 namespace BoutiquePortal.Services.Services
@@ -34,7 +33,7 @@ namespace BoutiquePortal.Services.Services
         public Task<int> ClearCartAsync(int customerId)
             => _repo.ClearAsync(customerId);
 
-        // ✅ Sync Session → DB (called on logout)
+        //  Sync Session → DB (called on logout)
 
         public async Task<List<CartItem>> GetCartItemsForSessionAsync(
             int customerId)

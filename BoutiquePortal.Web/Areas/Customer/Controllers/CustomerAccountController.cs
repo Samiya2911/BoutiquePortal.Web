@@ -13,12 +13,16 @@ namespace BoutiquePortal.Web.Areas.Customer.Controllers
     {
         private readonly ICustomerService _customerService;
         private readonly ICartService _cartService;
+        private readonly IPasswordResetService _resetService;
+
         public CustomerAccountController(
            ICustomerService customerService,
-           ICartService cartService)
+           ICartService cartService,
+           IPasswordResetService resetService)
         {
             _customerService = customerService;
             _cartService = cartService;
+            _resetService = resetService;
         }
 
         // ======= LOGIN GET =======
@@ -118,5 +122,62 @@ namespace BoutiquePortal.Web.Areas.Customer.Controllers
             return Redirect("/Home/Index");
             //  return RedirectToAction("Login", "CustomerAccount",new { area = "Customer" });
         }
+
+
+        // ======= FORGOT PASSWORD GET =======
+        public IActionResult ForgotPassword() => View();
+
+        // ======= FORGOT PASSWORD POST =======
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ForgotPassword(ForgotPasswordVM model)
+        {
+            if (!ModelState.IsValid) return View(model);
+
+            var (success, message, token) =
+                await _resetService.GenerateTokenAsync(model.Email, "Customer");
+
+            if (!success)
+            {
+                ModelState.AddModelError("", message);
+                return View(model);
+            }
+
+            ViewBag.ResetLink = $"/Customer/CustomerAccount/ResetPassword?token={token}";
+            ViewBag.TokenGenerated = true;
+            return View(model);
+        }
+
+
+        // ======= RESET PASSWORD GET =======
+        public IActionResult ResetPassword(string token)
+        {
+            if (string.IsNullOrEmpty(token))
+                return RedirectToAction("Login");
+
+            return View(new ResetPasswordVM { Token = token });
+        }
+
+        // ======= RESET PASSWORD POST =======
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ResetPassword(ResetPasswordVM model)
+        {
+            if (!ModelState.IsValid) return View(model);
+
+            var (success, message) =
+                await _resetService.ResetPasswordAsync(
+                    model.Token, model.NewPassword);
+
+            if (!success)
+            {
+                ModelState.AddModelError("", message);
+                return View(model);
+            }
+
+            TempData["SuccessMsg"] = message;
+            return RedirectToAction("Login");
+        }
+
     }
 }

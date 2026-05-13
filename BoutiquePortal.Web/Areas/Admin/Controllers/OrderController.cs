@@ -83,22 +83,19 @@ namespace BoutiquePortal.Web.Areas.Admin.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> UpdateStatus(
-    int orderId,
-    string orderStatus,
-    string paymentStatus)
+        public async Task<IActionResult> UpdateStatus(int orderId, string orderStatus, string paymentStatus)
         {
-            // ✅ STEP 1: Get BEFORE update
+            // STEP 1: Get BEFORE update
             var existingOrder = await _orderService.GetByIdAsync(orderId);
 
             string oldOrderStatus = existingOrder?.OrderStatus ?? "";
             string oldPaymentStatus = existingOrder?.PaymentStatus ?? "";
 
-            // ✅ STEP 2: Update status in DB
+            // STEP 2: Update status in DB
             await _orderService.UpdateStatusAsync(
                 orderId, orderStatus, paymentStatus);
 
-            // ✅ STEP 3: Trigger when Delivered + Paid
+            // STEP 3: Trigger when Delivered + Paid
             //            AND was NOT already Delivered+Paid before
             bool isNowDeliveredAndPaid =
                 orderStatus == "Delivered" &&
@@ -113,14 +110,14 @@ namespace BoutiquePortal.Web.Areas.Admin.Controllers
 
             if (shouldDecrease)
             {
-                // ✅ Decrease overall product quantity
+                // Decrease overall product quantity
                 int updated = await _orderService
                     .DecreaseProductQuantityAsync(orderId);
 
-                // ✅ Decrease size-specific quantity
+                // Decrease size-specific quantity
                 await _sizeService.DecreaseQuantityAsync(orderId);
 
-                // ✅ Auto deactivate out-of-stock products
+                // Auto deactivate out-of-stock products
                 await _orderService.UpdateStockStatusAsync();
 
                 TempData["Success"] = updated > 0

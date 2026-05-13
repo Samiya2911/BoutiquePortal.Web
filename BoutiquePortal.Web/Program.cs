@@ -76,6 +76,10 @@ builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
 builder.Services.AddScoped<ICustomerService, CustomerService>();
 
+// Password Reset
+builder.Services.AddScoped<IPasswordResetRepository, PasswordResetRepository>();
+builder.Services.AddScoped<IPasswordResetService, PasswordResetService>();
+
 //System.IO.InvalidDataException: 'Failed to load configuration from file 'D:\MCA Project\4 10 26 new start\BoutiquePortal.Web\BoutiquePortal.Web\appsettings.json'.'
 
 var app = builder.Build();

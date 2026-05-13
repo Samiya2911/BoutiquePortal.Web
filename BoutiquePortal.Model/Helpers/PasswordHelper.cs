@@ -10,7 +10,7 @@ namespace BoutiquePortal.Model.Helpers
 {
     public static class PasswordHelper
     {
-        // ✅ Hash a plain text password using SHA-256
+        //  Hash a plain text password using SHA-256
         public static string Hash(string plainText)
         {
             if (string.IsNullOrWhiteSpace(plainText))
@@ -29,14 +29,14 @@ namespace BoutiquePortal.Model.Helpers
             return sb.ToString();
         }
 
-        // ✅ Verify plain text against stored hash
+        //  Verify plain text against stored hash
         public static bool Verify(string plainText, string storedHash)
         {
             if (string.IsNullOrWhiteSpace(plainText) ||
                 string.IsNullOrWhiteSpace(storedHash))
                 return false;
 
-            // ✅ Handle migration: if stored is plain text (64 chars = SHA256)
+            //  Handle migration: if stored is plain text (64 chars = SHA256)
             // Plain text passwords are shorter than 64 chars in most cases
             if (storedHash.Length != 64)
             {
@@ -49,7 +49,7 @@ namespace BoutiquePortal.Model.Helpers
             return hashed == storedHash;
         }
 
-        // ✅ Check if a password is already hashed
+        //  Check if a password is already hashed
         public static bool IsHashed(string password)
         {
             // SHA-256 hex is always exactly 64 characters

@@ -345,7 +345,7 @@
                             //     window.location.href = url;
                             // }
 
-                            function addToCart() {
+                        function addToCart() {
                             if (hasSizes && !selectedSize) {
                                 document.getElementById('err-size').textContent =
                                     '⚠️ Please select a size first!';
@@ -354,7 +354,7 @@
 
                             var url = '/Shop/Cart/Add/@Model.ProductId?qty=' + qty;
 
-                            // ✅ Size gets passed in URL
+                            //  Size gets passed in URL
                             if (selectedSize)
                                 url += '&size=' + encodeURIComponent(selectedSize);
 
